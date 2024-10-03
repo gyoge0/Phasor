@@ -1,12 +1,14 @@
 //
-//  ContentView.swift
+//  PhasePlayer.swift
 //  Phasor
 //
-//  Created by YOGESH THAMBIDURAI (875367) on 9/13/24.
+//  Created by YOGESH THAMBIDURAI (875367) on 10/2/24.
 //
+
 
 import SwiftUI
 import PHASE
+import CoreMotion
 
 func simd_float4x4(
     _ a0: Float, _ a1: Float, _ a2: Float, _ a3: Float,
@@ -22,16 +24,16 @@ func simd_float4x4(
     ])
 }
 
-
 class PhasePlayer: ObservableObject {
     let engine = PHASEEngine(updateMode: .automatic)
+    let hmm = CMHeadphoneMotionManager()
     let listener : PHASEListener;
     let spatialMixerDefinition: PHASESpatialMixerDefinition;
     let spatialPipeline: PHASESpatialPipeline;
     
     
-    func addSoundAsset(url: URL, identifier: String) {
-        try! engine.assetRegistry.registerSoundAsset(
+    func addSoundAsset(url: URL, identifier: String) throws {
+        try engine.assetRegistry.registerSoundAsset(
             url: url,
             identifier: identifier,
             assetType: .resident,
@@ -40,27 +42,31 @@ class PhasePlayer: ObservableObject {
         )
     }
     
+    func removeAsset(identifier: String) {
+        engine.assetRegistry.unregisterAsset(identifier: identifier)
+    }
+        
     
-    func createPlaybackSource(transform: simd_float4x4) -> PHASESource {
+    func createPlaybackSource(transform: simd_float4x4) throws -> PHASESource {
         let source = PHASESource(engine: engine)
         
         source.transform = transform;
         
         // Attach the Source to the Engine's Scene Graph.
         // This actives the Listener within the simulation.
-        try! engine.rootObject.addChild(source)
+        try engine.rootObject.addChild(source)
         
         return source;
     }
     
     
-    func createSoundEvent(source: PHASESource, assetIdentifier: String) -> PHASESoundEvent {
+    func createSoundEvent(source: PHASESource, soundeEventAssetIdentifier: String) throws -> PHASESoundEvent  {
         // Associate the Source and Listener with the Spatial Mixer in the Sound Event.
         let mixerParameters = PHASEMixerParameters()
         mixerParameters.addSpatialMixerParameters(identifier: spatialMixerDefinition.identifier, source: source, listener: listener)
         
         // Create a Sound Event from the built Sound Event Asset "drumEvent".
-        let soundEvent = try! PHASESoundEvent(engine: engine, assetIdentifier: assetIdentifier, mixerParameters: mixerParameters)
+        let soundEvent = try PHASESoundEvent(engine: engine, assetIdentifier: soundeEventAssetIdentifier, mixerParameters: mixerParameters)
         
         return soundEvent;
     }
@@ -72,7 +78,7 @@ class PhasePlayer: ObservableObject {
         playbackMode: PHASEPlaybackMode,
         calibrationLevel: Double,
         cullOption: PHASECullOption
-    ) {
+    ) throws {
         // Create a Sampler Node from "drums" and hook it into the downstream Spatial Mixer.
         let samplerNodeDefinition = PHASESamplerNodeDefinition(soundAssetIdentifier: soundAssetIdentifier, mixerDefinition:spatialMixerDefinition)
         
@@ -84,9 +90,8 @@ class PhasePlayer: ObservableObject {
         
         // Set the Sampler Node's Cull Option to Sleep.
         samplerNodeDefinition.cullOption = cullOption;
-        
         // Register a Sound Event Asset with the Engine named "drumEvent".
-        try! engine.assetRegistry.registerSoundEventAsset(rootNode: samplerNodeDefinition, identifier: soundEventAssetIdentifier)
+        try engine.assetRegistry.registerSoundEventAsset(rootNode: samplerNodeDefinition, identifier: soundEventAssetIdentifier)
     }
     
     
@@ -113,72 +118,23 @@ class PhasePlayer: ObservableObject {
         distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(cullDistance: 10.0)
         distanceModelParameters.rolloffFactor = 1
         spatialMixerDefinition.distanceModelParameters = distanceModelParameters
+        
+        // start head tracking
+        hmm.startDeviceMotionUpdates(to: OperationQueue.current!, withHandler: {motion, error  in
+            guard let motion = motion, error == nil else { return }
+            let m = motion.attitude.rotationMatrix
+            let headphoneTransform = simd_float4x4(
+                Float(m.m11), Float(m.m12), Float(m.m13), Float(0),
+                Float(m.m21), Float(m.m22), Float(m.m23), Float(0),
+                Float(m.m31), Float(m.m32), Float(m.m33), Float(0),
+                Float(0),     Float(0),     Float(0),     Float(1)
+            )
+            self.listener.transform = headphoneTransform
+        })
+    }
+
+    
+    deinit {
+        hmm.stopDeviceMotionUpdates()
     }
 }
-
-
-struct ContentView: View {
-    @StateObject var player = PhasePlayer()
-    @State var leftSource: PHASESource!
-    @State var rightSource: PHASESource!
-    
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-            
-            Button(action: { playSound(source: rightSource) }) {
-                Text("Play Sound Right")
-            }
-            Button(action: { playSound(source: leftSource) }) {
-                Text("Play Sound Left")
-            }
-        }
-        .padding()
-        .onAppear(perform: initOnAppear)
-    }
-
-    
-    private func initOnAppear() {
-        // Retrieve the URL to an Audio File stored in our Application Bundle.
-        let audioFileUrl = Bundle.main.url(forResource: "drums", withExtension: "wav")!
-        
-        // Register the Audio File at the URL.
-        player.addSoundAsset(url: audioFileUrl, identifier: "drums")
-        
-        player.createSoundEventAsset(
-            soundEventAssetIdentifier: "drumsEvent",
-            soundAssetIdentifier: "drums",
-            playbackMode: .oneShot,
-            calibrationLevel: 0.0,
-            cullOption: .sleepWakeAtRealtimeOffset
-        )
-        
-        leftSource = player.createPlaybackSource(transform: simd_float4x4(
-            1.0, 0.0, 0.0, -2.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
-        ));
-        
-        rightSource = player.createPlaybackSource(transform: simd_float4x4(
-            1.0, 0.0, 0.0, 2.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
-        ));
-        
-        try! player.engine.start()
-    }
-    
-    
-    func playSound(source: PHASESource) {
-        let soundEvent = player.createSoundEvent(source: source, assetIdentifier: "drumsEvent")
-        
-        
-        soundEvent.start()
-    }
-}
-

@@ -6,12 +6,24 @@
 //
 
 import SwiftUI
+import ARKit
 
 @main
 struct PhasorApp: App {
+    var phasePlayer = PhasePlayer()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if (checkTechnologiesSupported()) {
+                HomeView()
+            } else {
+                NotSupportedView()
+            }
         }
+        .environmentObject(PhasePlayer())
+    }
+    
+    func checkTechnologiesSupported() -> Bool {
+        return ARConfiguration.isSupported && phasePlayer.hmm.isDeviceMotionAvailable
     }
 }

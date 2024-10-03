@@ -10,9 +10,13 @@
 		F122B2D42CA46E35003940EC /* drums.wav in Resources */ = {isa = PBXBuildFile; fileRef = F122B2D32CA46E35003940EC /* drums.wav */; };
 		F122B2D62CA46F0B003940EC /* ode_to_joy.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F122B2D52CA46F0B003940EC /* ode_to_joy.mp3 */; };
 		F12CCFD72C949CDB00FE1342 /* PhasorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12CCFD62C949CDB00FE1342 /* PhasorApp.swift */; };
-		F12CCFD92C949CDB00FE1342 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12CCFD82C949CDB00FE1342 /* ContentView.swift */; };
+		F12CCFD92C949CDB00FE1342 /* DrumBeatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12CCFD82C949CDB00FE1342 /* DrumBeatView.swift */; };
 		F12CCFDB2C949CDE00FE1342 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F12CCFDA2C949CDE00FE1342 /* Assets.xcassets */; };
 		F12CCFDE2C949CDE00FE1342 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F12CCFDD2C949CDE00FE1342 /* Preview Assets.xcassets */; };
+		F17CA4322CAE02E400F8EAC0 /* PhasePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17CA4312CAE02E400F8EAC0 /* PhasePlayer.swift */; };
+		F193F1DC2CAEEF6D00D83FFD /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F193F1DB2CAEEF6D00D83FFD /* HomeView.swift */; };
+		F193F1DE2CAEF0AC00D83FFD /* NotSupportedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F193F1DD2CAEF0AC00D83FFD /* NotSupportedView.swift */; };
+		F193F1E72CAF083400D83FFD /* BasicArDrumBeatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F193F1E62CAF083400D83FFD /* BasicArDrumBeatView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,9 +24,14 @@
 		F122B2D52CA46F0B003940EC /* ode_to_joy.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ode_to_joy.mp3; sourceTree = "<group>"; };
 		F12CCFD32C949CDB00FE1342 /* Phasor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Phasor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F12CCFD62C949CDB00FE1342 /* PhasorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhasorApp.swift; sourceTree = "<group>"; };
-		F12CCFD82C949CDB00FE1342 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F12CCFD82C949CDB00FE1342 /* DrumBeatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrumBeatView.swift; sourceTree = "<group>"; };
 		F12CCFDA2C949CDE00FE1342 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F12CCFDD2C949CDE00FE1342 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F133C7C92CAC41DC00C5AB02 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F17CA4312CAE02E400F8EAC0 /* PhasePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhasePlayer.swift; sourceTree = "<group>"; };
+		F193F1DB2CAEEF6D00D83FFD /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		F193F1DD2CAEF0AC00D83FFD /* NotSupportedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotSupportedView.swift; sourceTree = "<group>"; };
+		F193F1E62CAF083400D83FFD /* BasicArDrumBeatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicArDrumBeatView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,12 +64,15 @@
 		F12CCFD52C949CDB00FE1342 /* Phasor */ = {
 			isa = PBXGroup;
 			children = (
+				F193F1DF2CAEF38F00D83FFD /* ViewModels */,
+				F133C7C92CAC41DC00C5AB02 /* Info.plist */,
 				F122B2D52CA46F0B003940EC /* ode_to_joy.mp3 */,
 				F12CCFD62C949CDB00FE1342 /* PhasorApp.swift */,
 				F1B3D33E2CA1C89800DFA399 /* Views */,
 				F12CCFDA2C949CDE00FE1342 /* Assets.xcassets */,
 				F12CCFDC2C949CDE00FE1342 /* Preview Content */,
 				F122B2D32CA46E35003940EC /* drums.wav */,
+				F17CA4312CAE02E400F8EAC0 /* PhasePlayer.swift */,
 			);
 			path = Phasor;
 			sourceTree = "<group>";
@@ -73,10 +85,20 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		F193F1DF2CAEF38F00D83FFD /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		F1B3D33E2CA1C89800DFA399 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				F12CCFD82C949CDB00FE1342 /* ContentView.swift */,
+				F12CCFD82C949CDB00FE1342 /* DrumBeatView.swift */,
+				F193F1E62CAF083400D83FFD /* BasicArDrumBeatView.swift */,
+				F193F1DB2CAEEF6D00D83FFD /* HomeView.swift */,
+				F193F1DD2CAEF0AC00D83FFD /* NotSupportedView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -153,7 +175,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F12CCFD92C949CDB00FE1342 /* ContentView.swift in Sources */,
+				F17CA4322CAE02E400F8EAC0 /* PhasePlayer.swift in Sources */,
+				F193F1DE2CAEF0AC00D83FFD /* NotSupportedView.swift in Sources */,
+				F193F1DC2CAEEF6D00D83FFD /* HomeView.swift in Sources */,
+				F12CCFD92C949CDB00FE1342 /* DrumBeatView.swift in Sources */,
+				F193F1E72CAF083400D83FFD /* BasicArDrumBeatView.swift in Sources */,
 				F12CCFD72C949CDB00FE1342 /* PhasorApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -291,6 +317,9 @@
 				DEVELOPMENT_TEAM = 5J5Q86SD6J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Phasor/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Needs to use camera for AR experiences";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Needs to use motion to track head movement";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -320,6 +349,9 @@
 				DEVELOPMENT_TEAM = 5J5Q86SD6J;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Phasor/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Needs to use camera for AR experiences";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Needs to use motion to track head movement";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
