@@ -117,4 +117,5 @@ struct ARViewContainer: UIViewRepresentable {
 
 #Preview {
     BasicArDrumBeatView()
+        .environmentObject(PhasePlayer())
 }
