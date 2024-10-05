@@ -10,7 +10,7 @@ import ARKit
 
 @main
 struct PhasorApp: App {
-    var phasePlayer = PhasePlayer()
+    @StateObject var phasePlayer = PhasePlayer()
     
     var body: some Scene {
         WindowGroup {
