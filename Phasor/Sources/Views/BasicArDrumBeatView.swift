@@ -15,7 +15,11 @@ fileprivate let drumsSoundEventIdentifier = "basicardrumbeatview-drumsEvent"
 
 struct BasicArDrumBeatView: View {
     var body: some View {
-        ARViewContainer()
+        let delegate = BasicArDrumBeatSessionDelegate(player: player)
+        
+        let arViewRepresentable = BasicArDrumBeatViewRepresentable(delegate: delegate)
+                
+        arViewRepresentable
             .edgesIgnoringSafeArea(.all) // Makes ARView fill the entire screen
             .onAppear() {
                 try! initPlayerSources()
@@ -63,54 +67,65 @@ struct BasicArDrumBeatView: View {
     }
 }
 
-struct ARViewContainer: UIViewRepresentable {
-    func makeUIView(context: Context) -> ARSCNView {
-        let arView = ARSCNView()
-        arView.autoenablesDefaultLighting = true // Enables lighting for better visibility
-        arView.delegate = context.coordinator
+
+struct BasicArDrumBeatViewRepresentable: UIViewRepresentable {
+    let delegate: BasicArDrumBeatSessionDelegate
+    
+    init(delegate: BasicArDrumBeatSessionDelegate) {
+        self.delegate = delegate
+    }
+    
+    func makeUIView(context: Context) -> some UIView {
+        let arView = BasicArDrumBeatARView()
         
-        // Set up the AR session
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal, .vertical] // Detect horizontal and vertical planes
-        arView.session.run(configuration)
-        
-        let cubeNode = SCNNode(geometry: SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0))
-        cubeNode.position = SCNVector3(2, 0, 0) // SceneKit/AR coordinates are in meters
-        arView.scene.rootNode.addChildNode(cubeNode)
+        arView.session.delegate = delegate
         
         return arView
     }
     
-    func updateUIView(_ uiView: ARSCNView, context: Context) {
-        // Update the view if needed
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+    }
+}
+
+
+class BasicArDrumBeatSessionDelegate: NSObject, ARSessionDelegate {
+    let player: PhasePlayer
+    
+    init(player: PhasePlayer) {
+        self.player = player
     }
     
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        guard let transform =  session.currentFrame?.camera.transform else { return }
+        player.listener.transform = transform
+    }
+}
+
+
+class BasicArDrumBeatARView : ARView {
+    required init(frame: CGRect) {
+        super.init(frame: frame)
     }
     
-    class Coordinator: NSObject, ARSCNViewDelegate {
-        var parent: ARViewContainer
+    dynamic required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    convenience init() {
+        self.init(frame: UIScreen.main.bounds)
         
-        init(_ parent: ARViewContainer) {
-            self.parent = parent
-        }
+        placeOrb()
+    }
+    
+    func placeOrb() {
+        let sphere = MeshResource.generateSphere(radius: 0.2)
+        let material = SimpleMaterial(color: .blue, isMetallic: true)
+        let orb = ModelEntity(mesh: sphere, materials: [material])
         
-        func session(_ session: ARSession, didUpdate frame: ARFrame) {
-            // Get the current camera transform
-            let cameraTransform = frame.camera.transform
-            
-            // Extract the position from the transform
-            let cameraPosition = SCNVector3(
-                cameraTransform.columns.3.x,
-                cameraTransform.columns.3.y,
-                cameraTransform.columns.3.z
-            )
-            
-            // Report the camera's current position
-            print(cameraPosition.x)
-        }
-        
+        let anchor = AnchorEntity(world: .init(x: 2.0, y: 0.0, z: 0.0))
+        anchor.addChild(orb)
+
+        scene.addAnchor(anchor)
     }
 }
 
