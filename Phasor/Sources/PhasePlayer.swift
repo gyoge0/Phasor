@@ -115,7 +115,7 @@ class PhasePlayer: ObservableObject {
         
         // Set the Spatial Mixer's Distance Model.
         let distanceModelParameters = PHASEGeometricSpreadingDistanceModelParameters()
-        distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(cullDistance: 10.0)
+        distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(cullDistance: 1.0)
         distanceModelParameters.rolloffFactor = 1
         spatialMixerDefinition.distanceModelParameters = distanceModelParameters
         
@@ -123,10 +123,11 @@ class PhasePlayer: ObservableObject {
         hmm.startDeviceMotionUpdates(to: OperationQueue.current!, withHandler: {motion, error  in
             guard let motion = motion, error == nil else { return }
             let m = motion.attitude.rotationMatrix
+            let c = self.listener.transform
             let headphoneTransform = simd_float4x4(
-                Float(m.m11), Float(m.m12), Float(m.m13), Float(0),
-                Float(m.m21), Float(m.m22), Float(m.m23), Float(0),
-                Float(m.m31), Float(m.m32), Float(m.m33), Float(0),
+                Float(m.m11), Float(m.m12), Float(m.m13), c.columns.3.x,
+                Float(m.m21), Float(m.m22), Float(m.m23), c.columns.3.y,
+                Float(m.m31), Float(m.m32), Float(m.m33), c.columns.3.z,
                 Float(0),     Float(0),     Float(0),     Float(1)
             )
             self.listener.transform = headphoneTransform
