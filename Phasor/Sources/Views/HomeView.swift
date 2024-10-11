@@ -18,7 +18,7 @@ struct HomeView: View {
                 NavigationLink(destination: BasicArDrumBeatView()) {
                     Text("Drum Beat with AR")
                 }
-                NavigationLink(destination: EspressoArView()) {
+                NavigationLink(destination: EspressoArConfigView()) {
                     Text("Espresso in AR")
                 }
             }
