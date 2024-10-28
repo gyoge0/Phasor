@@ -21,6 +21,9 @@ struct HomeView: View {
                 NavigationLink(destination: EspressoArConfigView()) {
                     Text("Espresso in AR")
                 }
+                NavigationLink(destination: ArPlaceObjectsView()) {
+                    Text("Place AR objects")
+                }
             }
             .navigationTitle("Home")
         }
