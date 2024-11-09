@@ -10,13 +10,28 @@ import RealityKit
 import ARKit
 import PHASE
 
-fileprivate let drumsSoundIdentifier = "arplaceobjectsview-drums"
-fileprivate let drumsSoundEventIdentifier = "arplaceobjectsview-drumsEvent"
+fileprivate let tracks = [
+    "espresso_backings",
+    "espresso_bass",
+    "espresso_drums",
+    "espresso_guitar_others",
+    "espresso_vocal",
+    "drums",
+]
+
+fileprivate func getSoundIdentifier(for track: String) -> String {
+    return "arplaceobjectsview-\(track)"
+}
+
+fileprivate func getSoundEventIdentifier(for track: String) -> String {
+    return "arplaceobjectsview-\(track)Event"
+}
+
 
 struct ArPlaceObjectsView: View {
     @StateObject var arViewDelegate = ArPlaceObjectsDelegate()
     @EnvironmentObject var player: PhasePlayer
-
+    
     var body: some View {
         ZStack {
             ArPlaceObjectsViewRepresentable(delegate: arViewDelegate)
@@ -27,16 +42,38 @@ struct ArPlaceObjectsView: View {
                     value: $arViewDelegate.distance,
                     in: 0.0...3.0
                 )
-                Button( action: {
-                    let anchor = arViewDelegate.placeOrb()
-                    let soundSource = try! player.createPlaybackSource(
-                        transform: anchor.transform.matrix
-                    )
-                    
-                    let soundEvent = try! player.createSoundEvent(source: soundSource, soundeEventAssetIdentifier: drumsSoundEventIdentifier)
-                    
-                    soundEvent.start()
-                }) {
+                Menu() {
+                    Button("Drums") {
+                        placeSoundSource(
+                            playing: getSoundEventIdentifier(for: "drums")
+                        )
+                    }
+                    Button("Espresso Backings") {
+                        placeSoundSource(
+                            playing: getSoundEventIdentifier(for: "espresso_backings")
+                        )
+                    }
+                    Button("Espresso Bass") {
+                        placeSoundSource(
+                            playing: getSoundEventIdentifier(for: "espresso_bass")
+                        )
+                    }
+                    Button("Espresso Drums") {
+                        placeSoundSource(
+                            playing: getSoundEventIdentifier(for: "espresso_drums")
+                        )
+                    }
+                    Button("Espresso Guitar and others") {
+                        placeSoundSource(
+                            playing: getSoundEventIdentifier(for: "espresso_guitar_others")
+                        )
+                    }
+                    Button("Espresso Vocals") {
+                        placeSoundSource(
+                            playing: getSoundEventIdentifier(for: "espresso_vocal")
+                        )
+                    }
+                } label: {
                     Image(systemName: "plus.viewfinder")
                         .font(.custom("SF", size: 100.0, relativeTo: .title))
                         .symbolRenderingMode(.palette)
@@ -47,41 +84,64 @@ struct ArPlaceObjectsView: View {
         }
         .onAppear {
             try! initPlayerSources()
+            arViewDelegate.player = player
         }
         .onDisappear {
             deinitPlayerSources()
         }
     }
     
-    
-    private func initPlayerSources() throws {
-        // Retrieve the URL to an Audio File stored in our Application Bundle.
-        let audioFileUrl = Bundle.main.url(forResource: "drums", withExtension: "wav")!
+    private func placeSoundSource(playing soundEventAssetIdentifier: String) {
+        let position = arViewDelegate.placeOrb()
         
-        // Register the Audio File at the URL.
-        try player.addSoundAsset(url: audioFileUrl, identifier: drumsSoundIdentifier)
+        var transform = simd_float4x4(1)
+        transform.columns.3.x = position.x
+        transform.columns.3.y = position.y
+        transform.columns.3.z = position.z
         
-        try player.createSoundEventAsset(
-            soundEventAssetIdentifier: drumsSoundEventIdentifier,
-            soundAssetIdentifier: drumsSoundIdentifier,
-            playbackMode: .oneShot,
-            calibrationLevel: 0.0,
-            cullOption: .sleepWakeAtRealtimeOffset
+        let soundSource = try! player.createPlaybackSource(
+            transform: transform
         )
         
-//        soundSource = try player.createPlaybackSource(transform: simd_float4x4(
-//            1.0, 0.0, 0.0, 2.0,
-//            0.0, 1.0, 0.0, 0.0,
-//            0.0, 0.0, 1.0, 0.0,
-//            0.0, 0.0, 0.0, 1.0
-//        ));
-//        
+        let soundEvent = try! player.createSoundEvent(
+            source: soundSource,
+            soundeEventAssetIdentifier: soundEventAssetIdentifier
+        )
+        
+        soundEvent.start()
+    }
+    
+    
+    private func initPlayerSources() throws {
+        for track in tracks {
+            // Retrieve the URL to an Audio File stored in our Application Bundle.
+            let audioFileUrl = Bundle.main.url(
+                forResource: track,
+                withExtension: "wav"
+            )!
+            
+            // Register the Audio File at the URL.
+            try player.addSoundAsset(
+                url: audioFileUrl,
+                identifier: getSoundIdentifier(for: track)
+            )
+            
+            try player.createSoundEventAsset(
+                soundEventAssetIdentifier: getSoundEventIdentifier(for: track),
+                soundAssetIdentifier: getSoundIdentifier(for: track),
+                playbackMode: .looping,
+                calibrationLevel: 0.0,
+                cullOption: .sleepWakeAtRealtimeOffset
+            )
+        }
         try! player.engine.start()
     }
     
     private func deinitPlayerSources() {
-        player.removeAsset(identifier: drumsSoundIdentifier)
-        player.removeAsset(identifier: drumsSoundEventIdentifier)
+        for track in tracks {
+            player.removeAsset(identifier: getSoundIdentifier(for: track))
+            player.removeAsset(identifier: getSoundEventIdentifier(for: track))
+        }
     }
 }
 
@@ -128,6 +188,8 @@ class ArPlaceObjectsDelegate : NSObject, ObservableObject, ARSessionDelegate {
     @Published var distance: Double = 1.0
     
     var arView: ARView!
+    var latestTransform: simd_float4x4?
+    var player: PhasePlayer!
     
     private func getPosition(forwards distance: Double, from transform: Transform) -> SIMD3<Float> {
         let direction = transform.matrix.columns.2
@@ -137,7 +199,7 @@ class ArPlaceObjectsDelegate : NSObject, ObservableObject, ARSessionDelegate {
     }
     
     // this function has access to ARKit and can be called from SwiftUI
-    func placeOrb() -> AnchorEntity {
+    func placeOrb() -> SIMD3<Float> {
         let cameraTransform = arView.cameraTransform
         let position = getPosition(forwards: distance, from: cameraTransform)
         
@@ -147,13 +209,15 @@ class ArPlaceObjectsDelegate : NSObject, ObservableObject, ARSessionDelegate {
         
         let anchor = AnchorEntity(world: position)
         anchor.addChild(orb)
-
+        
         arView.scene.addAnchor(anchor)
-        return anchor
+        return position
     }
     
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard let transform = session.currentFrame?.camera.transform else { return }
+        if let transform = session.currentFrame?.camera.transform {
+            player.listener.transform = transform
+        }
     }
 }
 
