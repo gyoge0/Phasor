@@ -124,7 +124,7 @@ struct EspressoArConfigView : View {
                 isSelected: $useDrums
             )
             ConfigSelectionButton(
-                name: "Guiter and others",
+                name: "Guitar and others",
                 isSelected: $useGuitarOthers
             )
             ConfigSelectionButton(
