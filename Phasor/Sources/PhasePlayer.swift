@@ -60,13 +60,13 @@ class PhasePlayer: ObservableObject {
     }
     
     
-    func createSoundEvent(source: PHASESource, soundeEventAssetIdentifier: String) throws -> PHASESoundEvent  {
+    func createSoundEvent(source: PHASESource, soundEventAssetIdentifier: String) throws -> PHASESoundEvent  {
         // Associate the Source and Listener with the Spatial Mixer in the Sound Event.
         let mixerParameters = PHASEMixerParameters()
         mixerParameters.addSpatialMixerParameters(identifier: spatialMixerDefinition.identifier, source: source, listener: listener)
         
         // Create a Sound Event from the built Sound Event Asset "drumEvent".
-        let soundEvent = try PHASESoundEvent(engine: engine, assetIdentifier: soundeEventAssetIdentifier, mixerParameters: mixerParameters)
+        let soundEvent = try PHASESoundEvent(engine: engine, assetIdentifier: soundEventAssetIdentifier, mixerParameters: mixerParameters)
         
         return soundEvent;
     }

@@ -105,7 +105,7 @@ struct ArPlaceObjectsView: View {
         
         let soundEvent = try! player.createSoundEvent(
             source: soundSource,
-            soundeEventAssetIdentifier: soundEventAssetIdentifier
+            soundEventAssetIdentifier: soundEventAssetIdentifier
         )
         
         soundEvent.start()

@@ -165,7 +165,7 @@ struct EspressoArView : View {
                 for (track, soundSource) in soundSources {
                     let soundEvent = try! player.createSoundEvent(
                         source: soundSource,
-                        soundeEventAssetIdentifier: getSoundEventIdentifier(for: track)
+                        soundEventAssetIdentifier: getSoundEventIdentifier(for: track)
                     )
                     
                     soundEvent.start()

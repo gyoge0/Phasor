@@ -24,7 +24,7 @@ struct BasicArDrumBeatView: View {
             .onAppear() {
                 try! initPlayerSources()
                 
-                let soundEvent = try! player.createSoundEvent(source: soundSource, soundeEventAssetIdentifier: drumsSoundEventIdentifier)
+                let soundEvent = try! player.createSoundEvent(source: soundSource, soundEventAssetIdentifier: drumsSoundEventIdentifier)
                 
                 soundEvent.start()
             }

@@ -101,7 +101,7 @@ struct DrumBeatView: View {
     
     
     func playSound(source: PHASESource) {
-        let soundEvent = try! player.createSoundEvent(source: source, soundeEventAssetIdentifier: drumsSoundEventIdentifier)
+        let soundEvent = try! player.createSoundEvent(source: source, soundEventAssetIdentifier: drumsSoundEventIdentifier)
         
         
         soundEvent.start()
