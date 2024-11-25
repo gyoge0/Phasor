@@ -15,10 +15,17 @@ struct PhasorApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if (checkTechnologiesSupported()) {
-                HomeView()
-            } else {
-                NotSupportedView()
+            TabView {
+                Tab("Projects", systemImage: "folder") {
+                    if (checkTechnologiesSupported()) {
+                        HomeView()
+                    } else {
+                        NotSupportedView()
+                    }
+                }
+                Tab("Tracks", systemImage: "waveform.path") {
+                    AudioModelView()
+                }
             }
         }
         .environmentObject(PhasePlayer())
