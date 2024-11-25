@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import ARKit
 
 @main
@@ -21,6 +22,7 @@ struct PhasorApp: App {
             }
         }
         .environmentObject(PhasePlayer())
+        .modelContainer(for: AudioTrackModel.self)
     }
     
     func checkTechnologiesSupported() -> Bool {
