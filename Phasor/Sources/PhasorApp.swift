@@ -11,28 +11,43 @@ import ARKit
 
 @main
 struct PhasorApp: App {
-    @StateObject var phasePlayer = PhasePlayer()
+    @StateObject var phasePlayer = PhasePlayerFromUrl()
     
     var body: some Scene {
-        WindowGroup {
-            TabView {
-                Tab("Projects", systemImage: "folder") {
-                    if (checkTechnologiesSupported()) {
-                        HomeView()
-                    } else {
-                        NotSupportedView()
-                    }
-                }
-                Tab("Tracks", systemImage: "waveform.path") {
-                    AudioModelView()
-                }
-            }
+        DocumentGroup(
+            editing: PhasorSubProject.self,
+            contentType: .phasorProject
+        ) {
+            MyView()
         }
-        .environmentObject(PhasePlayer())
-        .modelContainer(for: AudioTrackModel.self)
     }
     
     func checkTechnologiesSupported() -> Bool {
         return ARConfiguration.isSupported && phasePlayer.hmm.isDeviceMotionAvailable
     }
+}
+
+struct MyView: View {
+    @Environment(\.modelContext) var modelContext;
+    
+    @Query var projects: [PhasorSubProject]
+    @State var toggle: Bool = false
+    
+    var body: some View {
+        TabView {
+            Tab("Projects", systemImage: "folder") {
+                Text("test")
+            }
+            Tab("Tracks", systemImage: "waveform.path") {
+                AudioModelView()
+            }
+        }
+    }
+}
+
+extension UTType {
+    static var phasorProject = UTType(
+        exportedAs: "com.gyoge.phasor.phasorproject",
+        conformingTo: .package
+    )
 }

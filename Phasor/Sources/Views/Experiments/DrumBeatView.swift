@@ -13,7 +13,7 @@ fileprivate let drumsSoundIdentifier = "drumbeatview-drums"
 fileprivate let drumsSoundEventIdentifier = "drumbeatview-drumsEvent"
 
 struct DrumBeatView: View {
-    @EnvironmentObject var player: PhasePlayer
+    @EnvironmentObject var player: PhasePlayerFromUrl
     
     @State var leftSource: PHASESource!
     @State var rightSource: PHASESource!
@@ -111,6 +111,6 @@ struct DrumBeatView: View {
 #Preview {
     NavigationView {
         DrumBeatView()
-            .environmentObject(PhasePlayer())
+            .environmentObject(PhasePlayerFromUrl())
     }
 }

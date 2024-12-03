@@ -110,6 +110,8 @@ struct AudioModelView: View {
 #endif
             return
         }
+        
+        let audioFormat = try! AVAudioFile(forReading: url).fileFormat
 
         modelContext.insert(AudioTrackModel(
             name: url.lastPathComponent,

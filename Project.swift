@@ -15,8 +15,21 @@ let project = Project(
                         "UIImageName": "",
                     ],
                     "NSCameraUsageDescription": "Phasor needs access to the camera to provide AR experiences.",
-                    "NSMotionUsageDescription": "Phasor needs access to motion data to track your head during dynamic audio experiences."
-
+                    "NSMotionUsageDescription": "Phasor needs access to motion data to track your head during dynamic audio experiences.",
+                    "UTExportedTypeDeclarations": [
+                        [
+                        "UTTypeIdentifier": "com.gyoge.phasor.phasorproject",
+                        "UTTypeConformsTo": [
+                            "com.apple.package"
+                        ],
+                        "UTTypeDescription": "Phasor project",
+                        "UTTypeTagSpecification": [
+                            "public.filename-extension": [
+                                "phasorproject"
+                            ]
+                        ]
+                        ]
+                    ]
                 ]
             ),
             sources: ["Phasor/Sources/**"],

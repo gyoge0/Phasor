@@ -178,7 +178,7 @@ struct EspressoArView : View {
     
     let tracks: [String]
     @State var soundSources: [String:PHASESource] = [:]
-    @EnvironmentObject var player: PhasePlayer
+    @EnvironmentObject var player: PhasePlayerFromUrl
     
     private func initPlayerSources() throws {
         for track in tracks {
@@ -249,9 +249,9 @@ struct EspressoArViewRepresentable: UIViewRepresentable {
 
 
 class EspressoArSessionDelegate: NSObject, ARSessionDelegate {
-    let player: PhasePlayer
+    let player: PhasePlayerFromUrl
     
-    init(player: PhasePlayer) {
+    init(player: PhasePlayerFromUrl) {
         self.player = player
     }
     
@@ -302,6 +302,6 @@ class EspressoArARView : ARView {
 #Preview {
     NavigationView {
         EspressoArConfigView()
-            .environmentObject(PhasePlayer())
+            .environmentObject(PhasePlayerFromUrl())
     }
 }

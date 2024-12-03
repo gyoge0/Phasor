@@ -30,7 +30,7 @@ fileprivate func getSoundEventIdentifier(for track: String) -> String {
 
 struct ArPlaceObjectsView: View {
     @StateObject var arViewDelegate = ArPlaceObjectsDelegate()
-    @EnvironmentObject var player: PhasePlayer
+    @EnvironmentObject var player: PhasePlayerFromUrl
     
     var body: some View {
         ZStack {
@@ -189,7 +189,7 @@ class ArPlaceObjectsDelegate : NSObject, ObservableObject, ARSessionDelegate {
     
     var arView: ARView!
     var latestTransform: simd_float4x4?
-    var player: PhasePlayer!
+    var player: PhasePlayerFromUrl!
     
     private func getPosition(forwards distance: Double, from transform: Transform) -> SIMD3<Float> {
         let direction = transform.matrix.columns.2
@@ -239,5 +239,5 @@ class ArPlaceObjectsARView : ARView, ARSessionDelegate {
 
 #Preview {
     ArPlaceObjectsView()
-        .environmentObject(PhasePlayer())
+        .environmentObject(PhasePlayerFromUrl())
 }

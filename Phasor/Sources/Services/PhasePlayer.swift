@@ -2,98 +2,89 @@
 //  PhasePlayer.swift
 //  Phasor
 //
-//  Created by YOGESH THAMBIDURAI (875367) on 10/2/24.
+//  Created by YOGESH THAMBIDURAI (875367) on 11/28/24.
 //
 
-
-import SwiftUI
+import Foundation
 import PHASE
 import CoreMotion
+import AVFoundation
 
-func simd_float4x4(
-    _ a0: Float, _ a1: Float, _ a2: Float, _ a3: Float,
-    _ b0: Float, _ b1: Float, _ b2: Float, _ b3: Float,
-    _ c0: Float, _ c1: Float, _ c2: Float, _ c3: Float,
-    _ d0: Float, _ d1: Float, _ d2: Float, _ d3: Float
-) -> simd_float4x4 {
-    return simd_float4x4(rows: [
-        SIMD4<Float>(a0, a1, a2, a3),
-        SIMD4<Float>(b0, b1, b2, b3),
-        SIMD4<Float>(c0, c1, c2, c3),
-        SIMD4<Float>(d0, d1, d2, d3),
-    ])
-}
+//func simd_float4x4(
+//    _ a0: Float, _ a1: Float, _ a2: Float, _ a3: Float,
+//    _ b0: Float, _ b1: Float, _ b2: Float, _ b3: Float,
+//    _ c0: Float, _ c1: Float, _ c2: Float, _ c3: Float,
+//    _ d0: Float, _ d1: Float, _ d2: Float, _ d3: Float
+//) -> simd_float4x4 {
+//    return simd_float4x4(rows: [
+//        SIMD4<Float>(a0, a1, a2, a3),
+//        SIMD4<Float>(b0, b1, b2, b3),
+//        SIMD4<Float>(c0, c1, c2, c3),
+//        SIMD4<Float>(d0, d1, d2, d3),
+//    ])
+//}
 
 class PhasePlayer: ObservableObject {
-    let engine = PHASEEngine(updateMode: .automatic)
-    let hmm = CMHeadphoneMotionManager()
-    let listener : PHASEListener;
-    let spatialMixerDefinition: PHASESpatialMixerDefinition;
-    let spatialPipeline: PHASESpatialPipeline;
+    private let engine = PHASEEngine(updateMode: .automatic)
+    private let hmm = CMHeadphoneMotionManager()
+    private let listener : PHASEListener;
+    private let spatialMixerDefinition: PHASESpatialMixerDefinition;
+    private let spatialPipeline: PHASESpatialPipeline;
+    private let distanceModelParameters : PHASEGeometricSpreadingDistanceModelParameters
+
+    func registerSoundAsset(_ soundAsset: SoundAsset) throws {
+        try engine.assetRegistry
+            .registerSoundAsset(
+                data: soundAsset.data,
+                identifier: soundAsset.id.uuidString,
+                format: soundAsset.audioFormat!,
+                normalizationMode: .dynamic
+            )
+    }
     
+    func unregisterSoundAsset(_ soundAsset: SoundAsset) {
+        engine.assetRegistry
+            .unregisterAsset(identifier: soundAsset.id.uuidString)
+    }
     
-    func addSoundAsset(url: URL, identifier: String) throws {
-        try engine.assetRegistry.registerSoundAsset(
-            url: url,
-            identifier: identifier,
-            assetType: .resident,
-            channelLayout: nil,
-            normalizationMode: .dynamic
+    func registerPlaybackSource(_ playbackSource: PlaybackSource) throws -> PHASESource{
+        let phaseSource = PHASESource(engine: engine)
+        
+        phaseSource.transform = playbackSource.transform
+        
+        try engine.rootObject.addChild(phaseSource)
+        
+        return phaseSource
+    }
+        
+    func registerSoundEvent(soundEvent: SoundEvent, source: PHASESource) throws  -> PHASESoundEvent {
+        let phaseMixerParameters = PHASEMixerParameters()
+        phaseMixerParameters
+            .addSpatialMixerParameters(
+                identifier: spatialMixerDefinition.identifier,
+                source: source,
+                listener: listener
+            )
+        
+        return try PHASESoundEvent(
+            engine: engine,
+            assetIdentifier: soundEvent.id.uuidString,
+            mixerParameters: phaseMixerParameters
         )
     }
     
-    func removeAsset(identifier: String) {
-        engine.assetRegistry.unregisterAsset(identifier: identifier)
+    func registerSoundEventAsset( soundEventAsset: SoundEventAsset ) throws {
+        let samplerNodeDefinition = PHASESamplerNodeDefinition(
+            soundAssetIdentifier: soundEventAsset.id.uuidString,
+            mixerDefinition: spatialMixerDefinition
+        )
+        
+        samplerNodeDefinition.playbackMode = soundEventAsset.playbackMode
+        samplerNodeDefinition.setCalibrationMode( calibrationMode: .relativeSpl, level: soundEventAsset .calibrationLevel)
+        samplerNodeDefinition.cullOption = soundEventAsset.cullOption
+        
+        try engine.assetRegistry .registerSoundEventAsset( rootNode: samplerNodeDefinition, identifier: soundEventAsset.id.uuidString )
     }
-        
-    
-    func createPlaybackSource(transform: simd_float4x4) throws -> PHASESource {
-        let source = PHASESource(engine: engine)
-        
-        source.transform = transform;
-        
-        // Attach the Source to the Engine's Scene Graph.
-        // This actives the Listener within the simulation.
-        try engine.rootObject.addChild(source)
-        
-        return source;
-    }
-    
-    
-    func createSoundEvent(source: PHASESource, soundEventAssetIdentifier: String) throws -> PHASESoundEvent  {
-        // Associate the Source and Listener with the Spatial Mixer in the Sound Event.
-        let mixerParameters = PHASEMixerParameters()
-        mixerParameters.addSpatialMixerParameters(identifier: spatialMixerDefinition.identifier, source: source, listener: listener)
-        
-        // Create a Sound Event from the built Sound Event Asset "drumEvent".
-        let soundEvent = try PHASESoundEvent(engine: engine, assetIdentifier: soundEventAssetIdentifier, mixerParameters: mixerParameters)
-        
-        return soundEvent;
-    }
-    
-    
-    func createSoundEventAsset(
-        soundEventAssetIdentifier: String,
-        soundAssetIdentifier: String,
-        playbackMode: PHASEPlaybackMode,
-        calibrationLevel: Double,
-        cullOption: PHASECullOption
-    ) throws {
-        // Create a Sampler Node from "drums" and hook it into the downstream Spatial Mixer.
-        let samplerNodeDefinition = PHASESamplerNodeDefinition(soundAssetIdentifier: soundAssetIdentifier, mixerDefinition:spatialMixerDefinition)
-        
-        // Set the Sampler Node's Playback Mode to Looping.
-        samplerNodeDefinition.playbackMode = playbackMode
-        
-        // Set the Sampler Node's Calibration Mode to Relative SPL and Level to 12 dB.
-        samplerNodeDefinition.setCalibrationMode(calibrationMode: .relativeSpl, level: calibrationLevel)
-        
-        // Set the Sampler Node's Cull Option to Sleep.
-        samplerNodeDefinition.cullOption = cullOption;
-        // Register a Sound Event Asset with the Engine named "drumEvent".
-        try engine.assetRegistry.registerSoundEventAsset(rootNode: samplerNodeDefinition, identifier: soundEventAssetIdentifier)
-    }
-    
     
     init() {
         self.listener = PHASEListener(engine: engine)
@@ -108,15 +99,13 @@ class PhasePlayer: ObservableObject {
         let spatialPipelineOptions: PHASESpatialPipeline.Flags = [.directPathTransmission, .lateReverb]
         self.spatialPipeline = PHASESpatialPipeline(flags: spatialPipelineOptions)!
         self.spatialPipeline.entries[PHASESpatialCategory.lateReverb]!.sendLevel = 0.1;
-        engine.defaultReverbPreset = .mediumRoom
+        
         
         // Create a Spatial Mixer with the Spatial Pipeline.
         self.spatialMixerDefinition = PHASESpatialMixerDefinition(spatialPipeline: self.spatialPipeline)
         
         // Set the Spatial Mixer's Distance Model.
-        let distanceModelParameters = PHASEGeometricSpreadingDistanceModelParameters()
-        distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(cullDistance: 1.0)
-        distanceModelParameters.rolloffFactor = 1
+        distanceModelParameters = PHASEGeometricSpreadingDistanceModelParameters()
         spatialMixerDefinition.distanceModelParameters = distanceModelParameters
         
         // start head tracking
@@ -133,7 +122,29 @@ class PhasePlayer: ObservableObject {
             self.listener.transform = headphoneTransform
         })
     }
-
+    
+    func loadProject(project: PhasorSubProject) throws {
+        engine.defaultReverbPreset = project.reverbPreset
+        distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(
+            cullDistance: project.cullDistance
+        )
+        distanceModelParameters.rolloffFactor = project.rolloffFactor
+        
+        let phasePlaybackSources = try project.playbackSources.map { try registerPlaybackSource($0)}
+        try project.soundAssets.forEach { try registerSoundAsset($0)}
+        try project.soundEventAssets.forEach { try registerSoundEventAsset(soundEventAsset: $0)}
+        
+        for (soundEvent, phasePlaybackSource) in zip(
+            project.soundEvents,
+            phasePlaybackSources
+        ) {
+            let phaseSoundEvent = try registerSoundEvent(
+                soundEvent: soundEvent,
+                source: phasePlaybackSource
+            )
+            phaseSoundEvent.start()
+        }
+    }
     
     deinit {
         hmm.stopDeviceMotionUpdates()

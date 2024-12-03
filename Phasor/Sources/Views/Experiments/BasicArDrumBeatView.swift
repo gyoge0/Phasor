@@ -34,7 +34,7 @@ struct BasicArDrumBeatView: View {
     }
     
     @State var soundSource: PHASESource!
-    @EnvironmentObject var player: PhasePlayer
+    @EnvironmentObject var player: PhasePlayerFromUrl
     
     private func initPlayerSources() throws {
         // Retrieve the URL to an Audio File stored in our Application Bundle.
@@ -89,9 +89,9 @@ struct BasicArDrumBeatViewRepresentable: UIViewRepresentable {
 
 
 class BasicArDrumBeatSessionDelegate: NSObject, ARSessionDelegate {
-    let player: PhasePlayer
+    let player: PhasePlayerFromUrl
     
-    init(player: PhasePlayer) {
+    init(player: PhasePlayerFromUrl) {
         self.player = player
     }
     
@@ -132,5 +132,5 @@ class BasicArDrumBeatARView : ARView {
 
 #Preview {
     BasicArDrumBeatView()
-        .environmentObject(PhasePlayer())
+        .environmentObject(PhasePlayerFromUrl())
 }
