@@ -62,6 +62,7 @@ struct DrumBeatView: View {
             cullOption: .sleepWakeAtRealtimeOffset
         )
         
+        // swift-format-ignore
         leftSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, -2.0,
             0.0, 1.0, 0.0, 0.0,
@@ -69,6 +70,7 @@ struct DrumBeatView: View {
             0.0, 0.0, 0.0, 1.0
         ));
         
+        // swift-format-ignore
         rightSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, 2.0,
             0.0, 1.0, 0.0, 0.0,
@@ -76,6 +78,7 @@ struct DrumBeatView: View {
             0.0, 0.0, 0.0, 1.0
         ));
         
+        // swift-format-ignore
         frontSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0,
@@ -83,6 +86,7 @@ struct DrumBeatView: View {
             0.0, 0.0, 0.0, 1.0
         ));
         
+        // swift-format-ignore
         aboveSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 2.0,

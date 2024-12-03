@@ -51,6 +51,7 @@ struct BasicArDrumBeatView: View {
             cullOption: .sleepWakeAtRealtimeOffset
         )
         
+        // swift-format-ignore
         soundSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, 2.0,
             0.0, 1.0, 0.0, 0.0,

@@ -204,6 +204,8 @@ struct EspressoArView : View {
             )
             
             let location = locations[track]!
+            
+            // swift-format-ignore
             let soundSource = try player.createPlaybackSource(transform: simd_float4x4(
                 1.0, 0.0, 0.0, location.x,
                 0.0, 1.0, 0.0, location.y,

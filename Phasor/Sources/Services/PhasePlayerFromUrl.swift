@@ -10,6 +10,7 @@ import SwiftUI
 import PHASE
 import CoreMotion
 
+// swift-format-ignore
 func simd_float4x4(
     _ a0: Float, _ a1: Float, _ a2: Float, _ a3: Float,
     _ b0: Float, _ b1: Float, _ b2: Float, _ b3: Float,
@@ -124,6 +125,7 @@ class PhasePlayerFromUrl: ObservableObject {
             guard let motion = motion, error == nil else { return }
             let m = motion.attitude.rotationMatrix
             let c = self.listener.transform
+            // swift-format-ignore
             let headphoneTransform = simd_float4x4(
                 Float(m.m11), Float(m.m12), Float(m.m13), c.columns.3.x,
                 Float(m.m21), Float(m.m22), Float(m.m23), c.columns.3.y,

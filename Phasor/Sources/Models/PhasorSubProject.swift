@@ -78,14 +78,16 @@ class PlaybackSource {
     @Transient
     var transform: simd_float4x4 {
         get {
+            // swift-format-ignore
             return simd_float4x4(
-                rawTransform[0], rawTransform[1], rawTransform[2], rawTransform[3],
-                rawTransform[4], rawTransform[5], rawTransform[6], rawTransform[7],
-                rawTransform[8], rawTransform[9], rawTransform[10], rawTransform[11],
+                rawTransform[0],  rawTransform[1],  rawTransform[2],  rawTransform[3],
+                rawTransform[4],  rawTransform[5],  rawTransform[6],  rawTransform[7],
+                rawTransform[8],  rawTransform[9],  rawTransform[10], rawTransform[11],
                 rawTransform[12], rawTransform[13], rawTransform[14], rawTransform[15]
             )
         }
         set(newValue) {
+            // swift-format-ignore
             rawTransform = [
                 newValue.columns.0.x, newValue.columns.1.x, newValue.columns.2.x, newValue.columns.3.x,
                 newValue.columns.0.y, newValue.columns.1.y, newValue.columns.2.y, newValue.columns.3.y,
