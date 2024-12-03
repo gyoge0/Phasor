@@ -5,14 +5,14 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 9/13/24.
 //
 
-import SwiftUI
-import SwiftData
 import ARKit
+import SwiftData
+import SwiftUI
 
 @main
 struct PhasorApp: App {
     @StateObject var phasePlayer = PhasePlayerFromUrl()
-    
+
     var body: some Scene {
         DocumentGroup(
             editing: PhasorSubProject.self,
@@ -21,18 +21,18 @@ struct PhasorApp: App {
             MyView()
         }
     }
-    
+
     func checkTechnologiesSupported() -> Bool {
         return ARConfiguration.isSupported && phasePlayer.hmm.isDeviceMotionAvailable
     }
 }
 
 struct MyView: View {
-    @Environment(\.modelContext) var modelContext;
-    
+    @Environment(\.modelContext) var modelContext
+
     @Query var projects: [PhasorSubProject]
     @State var toggle: Bool = false
-    
+
     var body: some View {
         TabView {
             Tab("Projects", systemImage: "folder") {

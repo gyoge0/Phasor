@@ -5,12 +5,12 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 10/22/24.
 //
 
-import SwiftUI
-import RealityKit
 import ARKit
 import PHASE
+import RealityKit
+import SwiftUI
 
-fileprivate let tracks = [
+private let tracks = [
     "espresso_backings",
     "espresso_bass",
     "espresso_drums",
@@ -19,30 +19,29 @@ fileprivate let tracks = [
     "drums",
 ]
 
-fileprivate func getSoundIdentifier(for track: String) -> String {
+private func getSoundIdentifier(for track: String) -> String {
     return "arplaceobjectsview-\(track)"
 }
 
-fileprivate func getSoundEventIdentifier(for track: String) -> String {
+private func getSoundEventIdentifier(for track: String) -> String {
     return "arplaceobjectsview-\(track)Event"
 }
-
 
 struct ArPlaceObjectsView: View {
     @StateObject var arViewDelegate = ArPlaceObjectsDelegate()
     @EnvironmentObject var player: PhasePlayerFromUrl
-    
+
     var body: some View {
         ZStack {
             ArPlaceObjectsViewRepresentable(delegate: arViewDelegate)
-                .edgesIgnoringSafeArea(.all) // Makes ARView fill the entire screen
+                .edgesIgnoringSafeArea(.all)  // Makes ARView fill the entire screen
             VStack {
                 Spacer()
                 Slider(
                     value: $arViewDelegate.distance,
                     in: 0.0...3.0
                 )
-                Menu() {
+                Menu {
                     Button("Drums") {
                         placeSoundSource(
                             playing: getSoundEventIdentifier(for: "drums")
@@ -90,28 +89,27 @@ struct ArPlaceObjectsView: View {
             deinitPlayerSources()
         }
     }
-    
+
     private func placeSoundSource(playing soundEventAssetIdentifier: String) {
         let position = arViewDelegate.placeOrb()
-        
+
         var transform = simd_float4x4(1)
         transform.columns.3.x = position.x
         transform.columns.3.y = position.y
         transform.columns.3.z = position.z
-        
+
         let soundSource = try! player.createPlaybackSource(
             transform: transform
         )
-        
+
         let soundEvent = try! player.createSoundEvent(
             source: soundSource,
             soundEventAssetIdentifier: soundEventAssetIdentifier
         )
-        
+
         soundEvent.start()
     }
-    
-    
+
     private func initPlayerSources() throws {
         for track in tracks {
             // Retrieve the URL to an Audio File stored in our Application Bundle.
@@ -119,13 +117,13 @@ struct ArPlaceObjectsView: View {
                 forResource: track,
                 withExtension: "wav"
             )!
-            
+
             // Register the Audio File at the URL.
             try player.addSoundAsset(
                 url: audioFileUrl,
                 identifier: getSoundIdentifier(for: track)
             )
-            
+
             try player.createSoundEventAsset(
                 soundEventAssetIdentifier: getSoundEventIdentifier(for: track),
                 soundAssetIdentifier: getSoundIdentifier(for: track),
@@ -136,7 +134,7 @@ struct ArPlaceObjectsView: View {
         }
         try! player.engine.start()
     }
-    
+
     private func deinitPlayerSources() {
         for track in tracks {
             player.removeAsset(identifier: getSoundIdentifier(for: track))
@@ -151,32 +149,32 @@ struct ArPlaceObjectsViewRepresentable: UIViewRepresentable {
     // Not sure why this has to be @ObservedObject and not just regular property
     // Setting the delegate's arView property is connects SwiftUI and ARKit
     @ObservedObject var delegate: ArPlaceObjectsDelegate
-    
+
     func makeUIView(context: Context) -> some UIView {
         let arView = ArPlaceObjectsARView()
-        
+
         let coachingOverlay = ARCoachingOverlayView()
-        
+
         coachingOverlay.translatesAutoresizingMaskIntoConstraints = false
         coachingOverlay.activatesAutomatically = true
         coachingOverlay.goal = .horizontalPlane
         coachingOverlay.session = arView.session
-        
+
         arView.addSubview(coachingOverlay)
-        
+
         NSLayoutConstraint.activate([
             coachingOverlay.centerXAnchor.constraint(equalTo: arView.centerXAnchor),
             coachingOverlay.centerYAnchor.constraint(equalTo: arView.centerYAnchor),
             coachingOverlay.widthAnchor.constraint(equalTo: arView.widthAnchor),
-            coachingOverlay.heightAnchor.constraint(equalTo: arView.heightAnchor)
+            coachingOverlay.heightAnchor.constraint(equalTo: arView.heightAnchor),
         ])
-        
+
         delegate.arView = arView
         arView.session.delegate = delegate
-        
+
         return arView
     }
-    
+
     func updateUIView(_ uiView: UIViewType, context: Context) {
     }
 }
@@ -184,36 +182,38 @@ struct ArPlaceObjectsViewRepresentable: UIViewRepresentable {
 // Has to extend ObservableObject to let the view use @StateObject on it
 // arView has to be nullable since it is assigned to it after
 // maybe can make it ARView! since I'm sure it's assigned before hand?
-class ArPlaceObjectsDelegate : NSObject, ObservableObject, ARSessionDelegate {
+class ArPlaceObjectsDelegate: NSObject, ObservableObject, ARSessionDelegate {
     @Published var distance: Double = 1.0
-    
+
     var arView: ARView!
     var latestTransform: simd_float4x4?
     var player: PhasePlayerFromUrl!
-    
+
     private func getPosition(forwards distance: Double, from transform: Transform) -> SIMD3<Float> {
         let direction = transform.matrix.columns.2
         let position = transform.translation
-        let newPosition = position - SIMD3(x: direction.x, y: direction.y, z: direction.z) * SIMD3(repeating: Float(distance))
+        let newPosition =
+            position - SIMD3(x: direction.x, y: direction.y, z: direction.z)
+            * SIMD3(repeating: Float(distance))
         return newPosition
     }
-    
+
     // this function has access to ARKit and can be called from SwiftUI
     func placeOrb() -> SIMD3<Float> {
         let cameraTransform = arView.cameraTransform
         let position = getPosition(forwards: distance, from: cameraTransform)
-        
+
         let sphere = MeshResource.generateSphere(radius: 0.2)
         let material = SimpleMaterial(color: .blue, isMetallic: true)
         let orb = ModelEntity(mesh: sphere, materials: [material])
-        
+
         let anchor = AnchorEntity(world: position)
         anchor.addChild(orb)
-        
+
         arView.scene.addAnchor(anchor)
         return position
     }
-    
+
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         if let transform = session.currentFrame?.camera.transform {
             player.listener.transform = transform
@@ -222,15 +222,15 @@ class ArPlaceObjectsDelegate : NSObject, ObservableObject, ARSessionDelegate {
 }
 
 // Custom ARView not required, this is just a sample class
-class ArPlaceObjectsARView : ARView, ARSessionDelegate {
+class ArPlaceObjectsARView: ARView, ARSessionDelegate {
     required init(frame: CGRect) {
         super.init(frame: frame)
     }
-    
+
     dynamic required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     convenience init() {
         self.init(frame: UIScreen.main.bounds)
         self.session.delegate = self

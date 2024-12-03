@@ -1,4 +1,3 @@
 import ProjectDescription
 
-let config = Config(
-)
+let config = Config()

@@ -5,70 +5,70 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 11/27/24.
 //
 
-import Foundation
-import SwiftUI
-import SwiftData
 import AVFoundation
+import Foundation
+import SwiftData
+import SwiftUI
 
-struct AudioTrackItem : View {
+struct AudioTrackItem: View {
     @State var audioTrack: AudioTrackModel
-    
+
     @Binding var currentlyPlayingTrack: AudioTrackModel?
     @Binding var playbackState: PlaybackState
     @Binding var avAudioPlayer: AVAudioPlayer!
-    
+
     @Environment(\.modelContext) var modelContext: ModelContext
-    
+
     var renameAction: () -> Void
     var playTrack: (AudioTrackModel) -> Void
-    
-    var body: some View {
-            Button {
-                if playbackState == .playing && currentlyPlayingTrack == audioTrack {
-                    avAudioPlayer.pause()
-                    playbackState = .paused
-                    return
-                }
 
-                if playbackState == .paused && currentlyPlayingTrack == audioTrack {
-                    avAudioPlayer.play()
-                    playbackState = .playing
-                    return
+    var body: some View {
+        Button {
+            if playbackState == .playing && currentlyPlayingTrack == audioTrack {
+                avAudioPlayer.pause()
+                playbackState = .paused
+                return
+            }
+
+            if playbackState == .paused && currentlyPlayingTrack == audioTrack {
+                avAudioPlayer.play()
+                playbackState = .playing
+                return
+            }
+
+            if playbackState == .playing {
+                avAudioPlayer.stop()
+            }
+
+            playTrack(audioTrack)
+
+        } label: {
+            HStack {
+                Text(audioTrack.name)
+                Spacer()
+                if currentlyPlayingTrack == audioTrack {
+                    if playbackState == .playing {
+                        Image(systemName: "pause")
+                    } else if playbackState == .paused {
+                        Image(systemName: "play")
+                    }
                 }
-                
-                if playbackState == .playing {
-                    avAudioPlayer.stop()
-                }
-                
-                playTrack(audioTrack)
-            
+            }
+        }
+        .foregroundStyle(.foreground)
+        .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+                modelContext.delete(audioTrack)
             } label: {
-                HStack {
-                    Text(audioTrack.name)
-                    Spacer()
-                    if currentlyPlayingTrack == audioTrack {
-                        if playbackState == .playing {
-                            Image(systemName: "pause")
-                        } else if playbackState == .paused {
-                            Image(systemName: "play")
-                        }
-                    }
-                }
+                Image(systemName: "trash")
             }
-            .foregroundStyle(.foreground)
-            .swipeActions(edge: .trailing) {
-                Button(role: .destructive) {
-                    modelContext.delete(audioTrack)
-                } label: {
-                    Image(systemName: "trash")
+            Button(
+                action: renameAction,
+                label: {
+                    Image(systemName: "pencil")
                 }
-                Button(
-                    action: renameAction,
-                    label: {
-                        Image(systemName: "pencil")
-                    }
-                )
-                .tint(.yellow)
-            }
+            )
+            .tint(.yellow)
+        }
     }
 }

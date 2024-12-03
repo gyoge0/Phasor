@@ -5,21 +5,21 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 9/13/24.
 //
 
-import SwiftUI
-import PHASE
 import CoreMotion
+import PHASE
+import SwiftUI
 
-fileprivate let drumsSoundIdentifier = "drumbeatview-drums"
-fileprivate let drumsSoundEventIdentifier = "drumbeatview-drumsEvent"
+private let drumsSoundIdentifier = "drumbeatview-drums"
+private let drumsSoundEventIdentifier = "drumbeatview-drumsEvent"
 
 struct DrumBeatView: View {
     @EnvironmentObject var player: PhasePlayerFromUrl
-    
+
     @State var leftSource: PHASESource!
     @State var rightSource: PHASESource!
     @State var frontSource: PHASESource!
     @State var aboveSource: PHASESource!
-    
+
     var body: some View {
         VStack {
             Button(action: { playSound(source: rightSource) }) {
@@ -45,15 +45,14 @@ struct DrumBeatView: View {
         }
         .navigationTitle("Drum Beat")
     }
-    
-    
+
     private func initPlayerSources() throws {
         // Retrieve the URL to an Audio File stored in our Application Bundle.
         let audioFileUrl = Bundle.main.url(forResource: "drums", withExtension: "wav")!
-        
+
         // Register the Audio File at the URL.
         try player.addSoundAsset(url: audioFileUrl, identifier: drumsSoundIdentifier)
-        
+
         try player.createSoundEventAsset(
             soundEventAssetIdentifier: drumsSoundEventIdentifier,
             soundAssetIdentifier: drumsSoundIdentifier,
@@ -61,53 +60,53 @@ struct DrumBeatView: View {
             calibrationLevel: 0.0,
             cullOption: .sleepWakeAtRealtimeOffset
         )
-        
+
         // swift-format-ignore
         leftSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, -2.0,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
-        ));
-        
+        ))
+
         // swift-format-ignore
         rightSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, 2.0,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
-        ));
-        
+        ))
+
         // swift-format-ignore
         frontSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, -2.0,
             0.0, 0.0, 0.0, 1.0
-        ));
-        
+        ))
+
         // swift-format-ignore
         aboveSource = try player.createPlaybackSource(transform: simd_float4x4(
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 2.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
-        ));
-        
+        ))
+
         try! player.engine.start()
     }
-    
+
     private func deinitPlayerSources() {
         player.removeAsset(identifier: drumsSoundIdentifier)
         player.removeAsset(identifier: drumsSoundEventIdentifier)
     }
-    
-    
-    
+
     func playSound(source: PHASESource) {
-        let soundEvent = try! player.createSoundEvent(source: source, soundEventAssetIdentifier: drumsSoundEventIdentifier)
-        
-        
+        let soundEvent = try! player.createSoundEvent(
+            source: source,
+            soundEventAssetIdentifier: drumsSoundEventIdentifier
+        )
+
         soundEvent.start()
     }
 }

@@ -11,6 +11,5 @@ import PackageDescription
 
 let package = Package(
     name: "Phasor",
-    dependencies: [
-    ]
+    dependencies: []
 )

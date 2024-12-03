@@ -8,14 +8,12 @@
 import Foundation
 import SwiftData
 
-
-@Model
-class AudioSourceModel {
+@Model class AudioSourceModel {
     @Attribute(.unique)
     var id: UUID
-    
+
     var audioTrack: AudioTrackModel?
-    
+
     init(id: UUID, audioTrack: AudioTrackModel) {
         self.id = id
         self.audioTrack = audioTrack
