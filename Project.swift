@@ -36,7 +36,9 @@ let project = Project(
             ),
             sources: ["Phasor/Sources/**"],
             resources: ["Phasor/Resources/**"],
-            dependencies: [],
+            dependencies: [
+                .external(name: "MetaCodable")
+            ],
             settings: .settings(
                 base: [:]
                     .automaticCodeSigning(devTeam: "5J5Q86SD6J")

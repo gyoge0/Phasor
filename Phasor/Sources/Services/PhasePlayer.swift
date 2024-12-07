@@ -136,7 +136,7 @@ class PhasePlayer: ObservableObject {
         )
     }
 
-    func loadProject(project: PhasorSubProject) throws {
+    func loadProject(project: PhasorProject) throws {
         engine.defaultReverbPreset = project.reverbPreset
         distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(
             cullDistance: project.cullDistance

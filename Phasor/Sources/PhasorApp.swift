@@ -14,40 +14,37 @@ struct PhasorApp: App {
     @StateObject var phasePlayer = PhasePlayerFromUrl()
 
     var body: some Scene {
-        DocumentGroup(
-            editing: PhasorSubProject.self,
-            contentType: .phasorProject
-        ) {
-            MyView()
-        }
+        WindowGroup {
+            TabView {
+                Tab("Projects", systemImage: "folder") {
+                    ProjectsView()
+                }
+            }
+        }.modelContainer(for: [
+            PhasorProject.self,
+            PlaybackSource.self,
+            SoundAsset.self,
+            SoundEvent.self,
+            SoundEventAsset.self,
+        ])
     }
 
     func checkTechnologiesSupported() -> Bool {
         return ARConfiguration.isSupported && phasePlayer.hmm.isDeviceMotionAvailable
     }
 }
-
-struct MyView: View {
+    
+struct ProjectsView : View{
+    @Query var projects: [PhasorProject]
     @Environment(\.modelContext) var modelContext
-
-    @Query var projects: [PhasorSubProject]
-    @State var toggle: Bool = false
-
+    
     var body: some View {
-        TabView {
-            Tab("Projects", systemImage: "folder") {
-                Text("test")
-            }
-            Tab("Tracks", systemImage: "waveform.path") {
-                AudioModelView()
-            }
+        Button("Add project") {
+            let project = PhasorProject()
+            modelContext.insert(project)
+        }
+        List(projects, id: \.id) { project in
+            ShareLink(item: project, preview: SharePreview(project.name))
         }
     }
-}
-
-extension UTType {
-    static var phasorProject = UTType(
-        exportedAs: "com.gyoge.phasor.phasorproject",
-        conformingTo: .package
-    )
 }
