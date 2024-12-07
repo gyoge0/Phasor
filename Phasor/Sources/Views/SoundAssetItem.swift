@@ -10,27 +10,27 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-struct AudioTrackItem: View {
-    @State var audioTrack: AudioTrackModel
+struct SoundAssetItem: View {
+    @State var soundAsset: SoundAsset
 
-    @Binding var currentlyPlayingTrack: AudioTrackModel?
+    @Binding var currentlyPlayingAsset: SoundAsset?
     @Binding var playbackState: PlaybackState
     @Binding var avAudioPlayer: AVAudioPlayer!
 
     @Environment(\.modelContext) var modelContext: ModelContext
 
     var renameAction: () -> Void
-    var playTrack: (AudioTrackModel) -> Void
+    var playAsset: (SoundAsset) -> Void
 
     var body: some View {
         Button {
-            if playbackState == .playing && currentlyPlayingTrack == audioTrack {
+            if playbackState == .playing && currentlyPlayingAsset == soundAsset {
                 avAudioPlayer.pause()
                 playbackState = .paused
                 return
             }
 
-            if playbackState == .paused && currentlyPlayingTrack == audioTrack {
+            if playbackState == .paused && currentlyPlayingAsset == soundAsset {
                 avAudioPlayer.play()
                 playbackState = .playing
                 return
@@ -40,13 +40,13 @@ struct AudioTrackItem: View {
                 avAudioPlayer.stop()
             }
 
-            playTrack(audioTrack)
+            playAsset(soundAsset)
 
         } label: {
             HStack {
-                Text(audioTrack.name)
+                Text(soundAsset.name)
                 Spacer()
-                if currentlyPlayingTrack == audioTrack {
+                if currentlyPlayingAsset == soundAsset {
                     if playbackState == .playing {
                         Image(systemName: "pause")
                     } else if playbackState == .paused {
@@ -58,7 +58,7 @@ struct AudioTrackItem: View {
         .foregroundStyle(.foreground)
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
-                modelContext.delete(audioTrack)
+                modelContext.delete(soundAsset)
             } label: {
                 Image(systemName: "trash")
             }

@@ -19,6 +19,9 @@ struct PhasorApp: App {
                 Tab("Projects", systemImage: "folder") {
                     ProjectsView()
                 }
+                Tab("Assets", systemImage: "waveform") {
+                    SoundAssetManagerView()
+                }
             }
         }.modelContainer(for: [
             PhasorProject.self,
@@ -34,17 +37,3 @@ struct PhasorApp: App {
     }
 }
     
-struct ProjectsView : View{
-    @Query var projects: [PhasorProject]
-    @Environment(\.modelContext) var modelContext
-    
-    var body: some View {
-        Button("Add project") {
-            let project = PhasorProject()
-            modelContext.insert(project)
-        }
-        List(projects, id: \.id) { project in
-            ShareLink(item: project, preview: SharePreview(project.name))
-        }
-    }
-}

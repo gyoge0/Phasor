@@ -15,45 +15,45 @@ enum PlaybackState {
     case stopped
 }
 
-struct AudioModelView: View {
-    @Query var audioTracks: [AudioTrackModel]
+struct SoundAssetManagerView: View {
+    @Query var soundAssets: [SoundAsset]
     @State var filePickerShown: Bool = false
     @Environment(\.modelContext) var modelContext: ModelContext
 
-    @State var selectedTrackForRename: AudioTrackModel?
-    @State var editedTrackName: String = ""
+    @State var selectedAssetForRename: SoundAsset?
+    @State var editedAssetName: String = ""
     @State var renameModalShown: Bool = false
 
-    @State var currentlyPlayingTrack: AudioTrackModel?
+    @State var currentlyPlayingAsset: SoundAsset?
     @State var playbackState: PlaybackState = .stopped
     @State var avAudioPlayer: AVAudioPlayer!
 
     var body: some View {
         NavigationStack {
-            List(audioTracks, id: \.id) { audioTrack in
-                AudioTrackItem(
-                    audioTrack: audioTrack,
-                    currentlyPlayingTrack: $currentlyPlayingTrack,
+            List(soundAssets, id: \.id) { soundAsset in
+                SoundAssetItem(
+                    soundAsset: soundAsset,
+                    currentlyPlayingAsset: $currentlyPlayingAsset,
                     playbackState: $playbackState,
                     avAudioPlayer: $avAudioPlayer,
                     renameAction: {
-                        selectedTrackForRename = audioTrack
-                        editedTrackName = audioTrack.name
+                        selectedAssetForRename = soundAsset
+                        editedAssetName = soundAsset.name
                         renameModalShown = true
                     },
-                    playTrack: { audioTrack in
-                        avAudioPlayer = try! AVAudioPlayer(data: audioTrack.trackData)
+                    playAsset: { soundAsset in
+                        avAudioPlayer = try! AVAudioPlayer(data: soundAsset.data)
                         guard avAudioPlayer.prepareToPlay() && avAudioPlayer.play() else {
                             #if DEBUG
                                 print("couldn't play audio")
                             #endif
                             avAudioPlayer = nil
-                            currentlyPlayingTrack = nil
+                            currentlyPlayingAsset = nil
                             playbackState = .stopped
                             return
                         }
 
-                        currentlyPlayingTrack = audioTrack
+                        currentlyPlayingAsset = soundAsset
                         playbackState = .playing
                     }
                 )
@@ -68,14 +68,14 @@ struct AudioModelView: View {
             .fileImporter(
                 isPresented: $filePickerShown,
                 allowedContentTypes: [.audio],
-                onCompletion: { result in importTrack(from: result) }
+                onCompletion: { result in importAsset(from: result) }
             )
             .overlay {
-                if audioTracks.isEmpty {
+                if soundAssets.isEmpty {
                     ContentUnavailableView.init(
-                        "No tracks",
+                        "No Assets",
                         systemImage: "tray",
-                        description: Text("Add a track to get started")
+                        description: Text("Add an asset to get started")
                     )
                 }
             }
@@ -83,18 +83,23 @@ struct AudioModelView: View {
                 "Rename",
                 isPresented: $renameModalShown,
                 actions: {
-                    TextField("Name", text: $editedTrackName)
+                    TextField("Name", text: $editedAssetName)
                     Button("Save") {
                         renameModalShown = false
-                        selectedTrackForRename?.name = editedTrackName
-                    }.disabled(editedTrackName.isEmpty)
+                        selectedAssetForRename?.name = editedAssetName
+                    }.disabled(editedAssetName.isEmpty)
                 }
             )
-            .navigationTitle("Tracks")
+            .navigationTitle("Assets")
+            .onDisappear {
+                avAudioPlayer.stop()
+                playbackState = .stopped
+                currentlyPlayingAsset = nil
+            }
         }
     }
 
-    private func importTrack(from result: Result<URL, any Error>) {
+    private func importAsset(from result: Result<URL, any Error>) {
         guard case .success(let url) = result else {
             #if DEBUG
                 print("file picker failure")
@@ -121,9 +126,10 @@ struct AudioModelView: View {
         let audioFormat = try! AVAudioFile(forReading: url).fileFormat
 
         modelContext.insert(
-            AudioTrackModel(
+            SoundAsset(
                 name: url.lastPathComponent,
-                trackData: audioData
+                data: audioData,
+                audioFormat: audioFormat
             )
         )
         filePickerShown = false
@@ -131,8 +137,8 @@ struct AudioModelView: View {
 }
 
 #Preview {
-    AudioModelView()
+    SoundAssetManagerView()
         .modelContainer(for: [
-            AudioTrackModel.self
+            SoundAsset.self
         ])
 }
