@@ -92,7 +92,9 @@ struct SoundAssetManagerView: View {
             )
             .navigationTitle("Assets")
             .onDisappear {
-                avAudioPlayer.stop()
+                if playbackState != .stopped {
+                    avAudioPlayer.stop()
+                }
                 playbackState = .stopped
                 currentlyPlayingAsset = nil
             }
