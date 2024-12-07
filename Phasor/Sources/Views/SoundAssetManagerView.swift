@@ -74,7 +74,7 @@ struct SoundAssetManagerView: View {
                 if soundAssets.isEmpty {
                     ContentUnavailableView.init(
                         "No Assets",
-                        systemImage: "tray",
+                        systemImage: "music.note.list",
                         description: Text("Add an asset to get started")
                     )
                 }
