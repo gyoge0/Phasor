@@ -84,6 +84,9 @@ struct SoundAssetManagerView: View {
                 isPresented: $renameModalShown,
                 actions: {
                     TextField("Name", text: $editedAssetName)
+                    Button("Cancel") {
+                        renameModalShown = false
+                    }
                     Button("Save") {
                         renameModalShown = false
                         selectedAssetForRename?.name = editedAssetName
