@@ -17,7 +17,7 @@ struct PhasorApp: App {
         WindowGroup {
             TabView {
                 Tab("Projects", systemImage: "folder") {
-                    ProjectsView()
+                    ProjectManagerView()
                 }
                 Tab("Assets", systemImage: "waveform") {
                     SoundAssetManagerView()
