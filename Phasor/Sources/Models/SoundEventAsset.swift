@@ -5,12 +5,11 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 12/6/24.
 //
 
-
 import Foundation
+import MetaCodable
 import PHASE
 import SwiftData
 import SwiftUI
-import MetaCodable
 
 /// How to play a specific audio track.
 @Codable
@@ -19,7 +18,7 @@ import MetaCodable
 class SoundEventAsset {
     @Attribute(.unique)
     var id: UUID = UUID()
-    
+
     var name: String = ""
 
     var rawPlaybackMode: Int! = PHASEPlaybackMode.looping.rawValue
@@ -44,9 +43,9 @@ class SoundEventAsset {
 
     @Relationship(deleteRule: .cascade, inverse: \SoundEvent.eventAsset)
     var associatedSoundEvents: [SoundEvent] = []
-    
+
     var associatedProjects: [PhasorProject] = []
-    
+
     @Relationship(inverse: \SoundAsset.associatedSoundEventAssets)
     var soundAssets: [SoundAsset] = []
 

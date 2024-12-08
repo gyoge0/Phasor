@@ -12,23 +12,23 @@ extension PHASEReverbPreset {
     // todo: is it best to use None as a default?
     static private let defaultName: String = "None"
     static private let defaultPreset: PHASEReverbPreset = PHASEReverbPreset.none
-    
+
     static let presets: [PHASEReverbPreset] = [
-         .cathedral,
-         .largeChamber,
-         .largeHall,
-         .largeHall2,
-         .largeRoom,
-         .largeRoom2,
-         .mediumChamber,
-         .mediumHall,
-         .mediumHall2,
-         .mediumHall3,
-         .mediumRoom,
-         .none,
-         .smallRoom,
+        .cathedral,
+        .largeChamber,
+        .largeHall,
+        .largeHall2,
+        .largeRoom,
+        .largeRoom2,
+        .mediumChamber,
+        .mediumHall,
+        .mediumHall2,
+        .mediumHall3,
+        .mediumRoom,
+        .none,
+        .smallRoom,
     ]
-    
+
     func getName() -> String {
         return switch self {
         case .cathedral: "Cathedral"
@@ -48,7 +48,7 @@ extension PHASEReverbPreset {
             PHASEReverbPreset.defaultName
         }
     }
-    
+
     static func fromName(_ name: String) -> PHASEReverbPreset {
         return switch name {
         case "Cathedral": .cathedral
@@ -67,5 +67,5 @@ extension PHASEReverbPreset {
         default: PHASEReverbPreset.defaultPreset
         }
     }
-    
+
 }

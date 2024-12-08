@@ -5,12 +5,11 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 12/6/24.
 //
 
-
 import Foundation
+import MetaCodable
 import PHASE
 import SwiftData
 import SwiftUI
-import MetaCodable
 
 /// Playback of a SoundEventAsset from a PlaybackSource
 @Codable
@@ -18,14 +17,13 @@ import MetaCodable
 @Model
 class SoundEvent {
 
-
     @Attribute(.unique)
     var id: UUID = UUID()
 
     var source: PlaybackSource
 
     var eventAsset: SoundEventAsset
-    
+
     @IgnoreCoding
     var project: PhasorProject? = nil
 

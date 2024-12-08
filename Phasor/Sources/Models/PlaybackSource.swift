@@ -5,12 +5,11 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 12/6/24.
 //
 
-
 import Foundation
+import MetaCodable
 import PHASE
 import SwiftData
 import SwiftUI
-import MetaCodable
 
 /// A point in space from which audio can be played.
 @Codable
@@ -21,7 +20,7 @@ class PlaybackSource {
     var id: UUID = UUID()
 
     var rawTransform: [Float]! = nil
-    
+
     @IgnoreCoding
     var project: PhasorProject? = nil
 

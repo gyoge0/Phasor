@@ -12,15 +12,15 @@ extension PHASECullOption {
     // todo: is it best to use None as a default?
     static private let defaultName: String = "Real Time"
     static private let defaultOption: PHASECullOption = .sleepWakeAtRealtimeOffset
-    
+
     static let options: [PHASECullOption] = [
         .doNotCull,
         .sleepWakeAtZero,
         .sleepWakeAtRandomOffset,
         .sleepWakeAtRealtimeOffset,
-        .terminate
+        .terminate,
     ]
-    
+
     func getName() -> String {
         return switch self {
         case .doNotCull: "None"
@@ -32,7 +32,7 @@ extension PHASECullOption {
             PHASECullOption.defaultName
         }
     }
-    
+
     static func fromName(_ name: String) -> PHASECullOption {
         return switch name {
         case "None": .doNotCull
@@ -43,5 +43,5 @@ extension PHASECullOption {
         default: PHASECullOption.defaultOption
         }
     }
-    
+
 }

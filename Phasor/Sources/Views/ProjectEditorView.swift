@@ -99,9 +99,6 @@ struct ProjectEditorView: View {
     }
 }
 
-
-
-
 // todo: find a better way to mock for previews
 @MainActor
 private func createContainer() -> ModelContainer {
@@ -126,7 +123,7 @@ private func createContainer() -> ModelContainer {
     var eventAssets: [SoundEventAsset]! = nil
     @Previewable @State
     var project = PhasorProject(name: "My Project")
-    
+
     let container = createContainer()
 
     NavigationStack {

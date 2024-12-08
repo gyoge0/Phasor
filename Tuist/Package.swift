@@ -12,6 +12,6 @@ import PackageDescription
 let package = Package(
     name: "Phasor",
     dependencies: [
-        .package(url: "https://github.com/SwiftyLab/MetaCodable", .upToNextMajor(from: "1.4.0")),
+        .package(url: "https://github.com/SwiftyLab/MetaCodable", .upToNextMajor(from: "1.4.0"))
     ]
 )

@@ -5,12 +5,11 @@
 //  Created by YOGESH THAMBIDURAI (875367) on 12/6/24.
 //
 
-
 import Foundation
+import MetaCodable
 import PHASE
 import SwiftData
 import SwiftUI
-import MetaCodable
 
 @Codable
 @Inherits(decodable: false, encodable: false)
@@ -40,20 +39,20 @@ class PhasorProject {
 
     @Relationship(deleteRule: .cascade, inverse: \PlaybackSource.project)
     var playbackSources: [PlaybackSource] = []
-    
+
     @Relationship(deleteRule: .nullify, inverse: \SoundEventAsset.associatedProjects)
     var soundEventAssets: [SoundEventAsset] = []
-    
+
     @Relationship(deleteRule: .cascade, inverse: \SoundEvent.project)
     var soundEvents: [SoundEvent] = []
 
     init(name: String = "New Project") {
         self.name = name
     }
-    
+
 }
 
-extension PhasorProject : Transferable {
+extension PhasorProject: Transferable {
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .phasorProject)
     }

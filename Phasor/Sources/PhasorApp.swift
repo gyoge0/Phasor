@@ -36,4 +36,3 @@ struct PhasorApp: App {
         return ARConfiguration.isSupported && phasePlayer.hmm.isDeviceMotionAvailable
     }
 }
-    
