@@ -146,7 +146,9 @@ class PhasePlayer: ObservableObject {
         let phasePlaybackSources = try project.playbackSources.map {
             try registerPlaybackSource($0)
         }
-        try project.soundAssets.forEach { try registerSoundAsset($0) }
+        try project.soundEventAssets
+            .flatMap(\.soundAssets)
+            .forEach { try registerSoundAsset($0) }
         try project.soundEventAssets.forEach { try registerSoundEventAsset(soundEventAsset: $0) }
 
         for (soundEvent, phasePlaybackSource) in zip(

@@ -14,7 +14,7 @@ struct ProjectItem: View {
     var renameAction: () -> Void
     
     var body: some View {
-        NavigationLink(project.name, destination: ProjectManagerView())
+        NavigationLink(project.name, destination: ProjectEditorView(project: $project))
         .foregroundStyle(.foreground)
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {

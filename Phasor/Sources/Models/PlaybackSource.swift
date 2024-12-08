@@ -21,6 +21,9 @@ class PlaybackSource {
     var id: UUID = UUID()
 
     var rawTransform: [Float]! = nil
+    
+    @IgnoreCoding
+    var project: PhasorProject? = nil
 
     @Transient
     var transform: simd_float4x4 {

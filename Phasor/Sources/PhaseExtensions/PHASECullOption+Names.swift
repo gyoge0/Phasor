@@ -8,63 +8,39 @@
 import Foundation
 import PHASE
 
-extension PHASEReverbPreset {
+extension PHASECullOption {
     // todo: is it best to use None as a default?
-    static private let defaultName: String = "None"
-    static private let defaultPreset: PHASEReverbPreset = PHASEReverbPreset.none
+    static private let defaultName: String = "Real Time"
+    static private let defaultOption: PHASECullOption = .sleepWakeAtRealtimeOffset
     
-    static let presets: [PHASEReverbPreset] = [
-         .cathedral,
-         .largeChamber,
-         .largeHall,
-         .largeHall2,
-         .largeRoom,
-         .largeRoom2,
-         .mediumChamber,
-         .mediumHall,
-         .mediumHall2,
-         .mediumHall3,
-         .mediumRoom,
-         .none,
-         .smallRoom,
+    static let options: [PHASECullOption] = [
+        .doNotCull,
+        .sleepWakeAtZero,
+        .sleepWakeAtRandomOffset,
+        .sleepWakeAtRealtimeOffset,
+        .terminate
     ]
     
     func getName() -> String {
         return switch self {
-        case .cathedral: "Cathedral"
-        case .largeChamber: "Large Chamber"
-        case .largeHall: "Large Hall"
-        case .largeHall2: "Large Hall 2"
-        case .largeRoom: "Large Room"
-        case .largeRoom2: "Large Room 2"
-        case .mediumChamber: "Medium Chamber"
-        case .mediumHall: "Medium Hall"
-        case .mediumHall2: "Medium Hall 2"
-        case .mediumHall3: "Medium Hall 3"
-        case .mediumRoom: "Medium Room"
-        case .none: "None"
-        case .smallRoom: "Small Room"
+        case .doNotCull: "None"
+        case .sleepWakeAtZero: "Restart"
+        case .sleepWakeAtRandomOffset: "Random Offset"
+        case .sleepWakeAtRealtimeOffset: "Real Time"
+        case .terminate: "Stop Playback"
         @unknown default:
-            PHASEReverbPreset.defaultName
+            PHASECullOption.defaultName
         }
     }
     
-    static func fromName(_ name: String) -> PHASEReverbPreset {
+    static func fromName(_ name: String) -> PHASECullOption {
         return switch name {
-        case "Cathedral": .cathedral
-        case "Large Chamber": .largeChamber
-        case "Large Hall": .largeHall
-        case "Large Hall 2": .largeHall2
-        case "Large Room": .largeRoom
-        case "Large Room 2": .largeRoom2
-        case "Medium Chamber": .mediumChamber
-        case "Medium Hall": .mediumHall
-        case "Medium Hall 2": .mediumHall2
-        case "Medium Hall 3": .mediumHall3
-        case "Medium Room": .mediumRoom
-        case "None": .none
-        case "Small Room": .smallRoom
-        default: PHASEReverbPreset.defaultPreset
+        case "None": .doNotCull
+        case "Restart": .sleepWakeAtZero
+        case "Random Offset": .sleepWakeAtRandomOffset
+        case "Real Time": .sleepWakeAtRealtimeOffset
+        case "Stop Playback": .terminate
+        default: PHASECullOption.defaultOption
         }
     }
     

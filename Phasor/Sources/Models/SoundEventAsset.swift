@@ -22,10 +22,7 @@ class SoundEventAsset {
     
     var name: String = ""
 
-    /** The audio track to play back. */
-    var soundAsset: SoundAsset
-
-    var rawPlaybackMode: Int! = nil
+    var rawPlaybackMode: Int! = PHASEPlaybackMode.looping.rawValue
 
     /** What to do when the audio track ends. */
     @Transient
@@ -35,9 +32,9 @@ class SoundEventAsset {
     }
 
     // TODO: document this - is it loudness???
-    var calibrationLevel: Double
+    var calibrationLevel: Double = 1.0
 
-    var rawCullOption: Int! = nil
+    var rawCullOption: Int! = PHASECullOption.sleepWakeAtRealtimeOffset.rawValue
 
     /** What to do when the audio source gets out of range. */
     @Transient var cullOption: PHASECullOption {
@@ -46,22 +43,14 @@ class SoundEventAsset {
     }
 
     @Relationship(deleteRule: .cascade, inverse: \SoundEvent.eventAsset)
-    var associatedSoundEvents: [SoundEvent]
+    var associatedSoundEvents: [SoundEvent] = []
+    
+    var associatedProjects: [PhasorProject] = []
+    
+    @Relationship(inverse: \SoundAsset.associatedSoundEventAssets)
+    var soundAssets: [SoundAsset] = []
 
-    init(
-        name: String = "",
-        soundAsset: SoundAsset,
-        playbackMode: PHASEPlaybackMode,
-        calibrationLevel: Double = 1.0,
-        cullOption: PHASECullOption = .sleepWakeAtRealtimeOffset,
-        associatedSoundEvents: [SoundEvent] = []
-    ) {
+    init(name: String = "") {
         self.name = name
-        self.soundAsset = soundAsset
-        self.calibrationLevel = calibrationLevel
-        self.associatedSoundEvents = associatedSoundEvents
-
-        self.playbackMode = playbackMode
-        self.cullOption = cullOption
     }
 }

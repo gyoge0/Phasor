@@ -21,7 +21,7 @@ class PhasorProject {
 
     var name: String
 
-    var _rawReverbPreset: Int! = nil
+    var _rawReverbPreset: Int! = PHASEReverbPreset.mediumHall.rawValue
 
     @Transient var reverbPreset: PHASEReverbPreset {
         get { return PHASEReverbPreset(rawValue: _rawReverbPreset)! }
@@ -29,42 +29,26 @@ class PhasorProject {
     }
 
     /** Distance beyond which sound sources stop playing. Must be >= 1. */
-    var cullDistance: Double
+    var cullDistance: Double = 1.0
 
     /**
      Strength of the rolloff effect when moving away from sound sources.
      Values less than one create a quicker roll off and values greater than one create longer roll offs.
      Must be >= 0.
      */
-    var rolloffFactor: Double
+    var rolloffFactor: Double = 1.0
 
-    var playbackSources: [PlaybackSource]
+    @Relationship(deleteRule: .cascade, inverse: \PlaybackSource.project)
+    var playbackSources: [PlaybackSource] = []
+    
+    @Relationship(deleteRule: .nullify, inverse: \SoundEventAsset.associatedProjects)
+    var soundEventAssets: [SoundEventAsset] = []
+    
+    @Relationship(deleteRule: .cascade, inverse: \SoundEvent.project)
+    var soundEvents: [SoundEvent] = []
 
-    var soundAssets: [SoundAsset]
-
-    var soundEventAssets: [SoundEventAsset]
-
-    var soundEvents: [SoundEvent]
-
-    init(
-        name: String = "New Project",
-        reverbPreset: PHASEReverbPreset = .mediumRoom,
-        cullDistance: Double = 1.0,
-        rolloffFactor: Double = 1.0,
-        playbackSources: [PlaybackSource] = [],
-        soundAssets: [SoundAsset] = [],
-        soundEventAssets: [SoundEventAsset] = [],
-        soundEvents: [SoundEvent] = []
-    ) {
+    init(name: String = "New Project") {
         self.name = name
-        self.cullDistance = cullDistance
-        self.rolloffFactor = rolloffFactor
-        self.playbackSources = playbackSources
-        self.soundAssets = soundAssets
-        self.soundEventAssets = soundEventAssets
-        self.soundEvents = soundEvents
-
-        self.reverbPreset = reverbPreset
     }
     
 }

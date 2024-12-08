@@ -15,9 +15,10 @@ struct ProjectManagerView : View {
     @State var renameModalShown: Bool = false
     @State var editedProjectName: String = ""
     @State var selectedProjectForRename: PhasorProject? = nil
+    @State var navigationPath = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             List(projects, id: \.id) { project in
                 ProjectItem(project: project, renameAction: {
                     selectedProjectForRename = project

@@ -25,6 +25,9 @@ class SoundEvent {
     var source: PlaybackSource
 
     var eventAsset: SoundEventAsset
+    
+    @IgnoreCoding
+    var project: PhasorProject? = nil
 
     init(source: PlaybackSource, eventAsset: SoundEventAsset) {
         self.source = source

@@ -57,19 +57,15 @@ class SoundAsset {
         }
     }
 
-    @Relationship(deleteRule: .cascade, inverse: \SoundEventAsset.soundAsset)
-    var associatedSoundEventAssets: [SoundEventAsset]
+    var associatedSoundEventAssets: [SoundEventAsset] = []
 
     init(
         name: String = "New Asset",
         data: Data,
-        audioFormat: AVAudioFormat,
-        associatedSoundEventAssets: [SoundEventAsset] = []
+        audioFormat: AVAudioFormat
     ) {
         self.name = name
         self.data = data
         self.associatedSoundEventAssets = associatedSoundEventAssets
-
-        self.audioFormat = audioFormat
     }
 }
