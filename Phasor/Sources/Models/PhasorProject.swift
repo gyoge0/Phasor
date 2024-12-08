@@ -34,7 +34,7 @@ class PhasorProject {
     /**
      Strength of the rolloff effect when moving away from sound sources.
      Values less than one create a quicker roll off and values greater than one create longer roll offs.
-     Must be >= 1.
+     Must be >= 0.
      */
     var rolloffFactor: Double
 
