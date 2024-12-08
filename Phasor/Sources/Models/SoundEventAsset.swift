@@ -19,6 +19,8 @@ import MetaCodable
 class SoundEventAsset {
     @Attribute(.unique)
     var id: UUID = UUID()
+    
+    var name: String = ""
 
     /** The audio track to play back. */
     var soundAsset: SoundAsset
@@ -47,12 +49,14 @@ class SoundEventAsset {
     var associatedSoundEvents: [SoundEvent]
 
     init(
+        name: String = "",
         soundAsset: SoundAsset,
         playbackMode: PHASEPlaybackMode,
         calibrationLevel: Double = 1.0,
         cullOption: PHASECullOption = .sleepWakeAtRealtimeOffset,
         associatedSoundEvents: [SoundEvent] = []
     ) {
+        self.name = name
         self.soundAsset = soundAsset
         self.calibrationLevel = calibrationLevel
         self.associatedSoundEvents = associatedSoundEvents
