@@ -19,7 +19,8 @@ struct SoundAssetItem: View {
 
     @Environment(\.modelContext) var modelContext: ModelContext
 
-    var renameAction: () -> Void
+    var renameAction: (() -> Void)?
+    var deleteAction: (() -> Void)?
     var playAsset: (SoundAsset) -> Void
 
     var body: some View {
@@ -57,18 +58,20 @@ struct SoundAssetItem: View {
         }
         .foregroundStyle(.foreground)
         .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-                modelContext.delete(soundAsset)
-            } label: {
-                Image(systemName: "trash")
-            }
-            Button(
-                action: renameAction,
-                label: {
-                    Image(systemName: "pencil")
+            if let deleteAction {
+                Button(role: .destructive, action: deleteAction) {
+                    Image(systemName: "trash")
                 }
-            )
-            .tint(.yellow)
+            }
+            if let renameAction {
+                Button(
+                    action: renameAction,
+                    label: {
+                        Image(systemName: "pencil")
+                    }
+                )
+                .tint(.yellow)
+            }
         }
     }
 }

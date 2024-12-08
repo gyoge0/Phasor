@@ -41,6 +41,14 @@ struct SoundAssetManagerView: View {
                         editedAssetName = soundAsset.name
                         renameModalShown = true
                     },
+                    deleteAction: {
+                        if currentlyPlayingAsset == soundAsset {
+                            currentlyPlayingAsset = nil
+                            playbackState = .stopped
+                            avAudioPlayer.stop()
+                        }
+                        modelContext.delete(soundAsset)
+                    },
                     playAsset: { soundAsset in
                         avAudioPlayer = try! AVAudioPlayer(data: soundAsset.data)
                         guard avAudioPlayer.prepareToPlay() && avAudioPlayer.play() else {
