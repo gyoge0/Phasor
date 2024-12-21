@@ -33,13 +33,23 @@ class PhasePlayer: ObservableObject {
     private let distanceModelParameters: PHASEGeometricSpreadingDistanceModelParameters
 
     func registerSoundAsset(_ soundAsset: SoundAsset) throws {
+        // the overload that uses Data just gives me EXC_BAD_ACCESS every time
+        // workaround for now is to write to a file and read it
+        let tempUrl = URL.documentsDirectory.appending(path: soundAsset.id.uuidString)
+        try soundAsset.data.write(to: tempUrl)
         try engine.assetRegistry
             .registerSoundAsset(
-                data: soundAsset.data,
+                url: tempUrl,
                 identifier: soundAsset.id.uuidString,
-                format: soundAsset.audioFormat!,
+                // this must be resident to load everything into memory
+                assetType: .resident,
+                // todo: need to store channel layout
+                channelLayout: nil,
                 normalizationMode: .dynamic
             )
+        // need to delete the temp file after finished
+        // todo: will deleting immediately before playing break it?
+        // try FileManager.default.removeItem(at: tempUrl)
     }
 
     func unregisterSoundAsset(_ soundAsset: SoundAsset) {
@@ -126,11 +136,11 @@ class PhasePlayer: ObservableObject {
                 let c = self.listener.transform
                 // swift-format-ignore
                 let headphoneTransform = simd_float4x4(
-                Float(m.m11), Float(m.m12), Float(m.m13), c.columns.3.x,
-                Float(m.m21), Float(m.m22), Float(m.m23), c.columns.3.y,
-                Float(m.m31), Float(m.m32), Float(m.m33), c.columns.3.z,
-                Float(0),     Float(0),     Float(0),     Float(1)
-            )
+                    Float(m.m11), Float(m.m12), Float(m.m13), c.columns.3.x,
+                    Float(m.m21), Float(m.m22), Float(m.m23), c.columns.3.y,
+                    Float(m.m31), Float(m.m32), Float(m.m33), c.columns.3.z,
+                    Float(0),     Float(0),     Float(0),     Float(1)
+                )
                 self.listener.transform = headphoneTransform
             }
         )
@@ -161,6 +171,14 @@ class PhasePlayer: ObservableObject {
             )
             phaseSoundEvent.start()
         }
+    }
+
+    func updateTransform(with newTransform: simd_float4x4) {
+        listener.transform = newTransform
+    }
+
+    func headTrackingSupported() -> Bool {
+        return hmm.isDeviceMotionAvailable
     }
 
     deinit {

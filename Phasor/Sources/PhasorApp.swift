@@ -32,7 +32,4 @@ struct PhasorApp: App {
         ])
     }
 
-    func checkTechnologiesSupported() -> Bool {
-        return ARConfiguration.isSupported && phasePlayer.hmm.isDeviceMotionAvailable
-    }
 }

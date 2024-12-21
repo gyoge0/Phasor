@@ -18,58 +18,64 @@ struct ProjectEditorView: View {
     @State var newSoundEventAsset: SoundEventAsset = SoundEventAsset(name: "New Sound Event")
 
     var body: some View {
-        Form {
-            Section("Reverb") {
-                Picker("Reverb Preset", selection: $project.reverbPreset) {
-                    ForEach(PHASEReverbPreset.presets, id: \.self) { preset in
-                        Text(preset.getName()).tag(preset)
+        VStack {
+            Form {
+                Section("Reverb") {
+                    Picker("Reverb Preset", selection: $project.reverbPreset) {
+                        ForEach(PHASEReverbPreset.presets, id: \.self) { preset in
+                            Text(preset.getName()).tag(preset)
+                        }
+                    }
+                }
+
+                Section("Rolloff") {
+                    HStack {
+                        #if os(macOS)
+                            Text("Rolloff Strength:")
+                        #else
+                            Text("Rolloff Strength")
+                        #endif
+
+                        Spacer()
+                        Text(project.rolloffFactor.rounded(to: 2).description)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Slider(value: $project.rolloffFactor, in: 0...2, step: 0.01)
+                }
+
+                Section("Culling") {
+                    HStack {
+                        #if os(macOS)
+                            Text("Cull Distance (m):")
+                        #else
+                            Text("Cull Distance (m)")
+                        #endif
+
+                        Spacer()
+                        Text(project.cullDistance.rounded(to: 1).description)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Slider(value: $project.cullDistance, in: 1...10, step: 0.1)
+                }
+
+                Section("Events") {
+                    Button("New Event") {
+                        popoverShown = true
+                    }
+                    List($project.soundEventAssets, id: \.id) { $item in
+                        NavigationLink(
+                            item.name,
+                            destination: SoundEventAssetEditorView(soundEventAsset: $item)
+                        )
                     }
                 }
             }
-
-            Section("Rolloff") {
-                HStack {
-                    #if os(macOS)
-                        Text("Rolloff Strength:")
-                    #else
-                        Text("Rolloff Strength")
-                    #endif
-
-                    Spacer()
-                    Text(project.rolloffFactor.rounded(to: 2).description)
-                        .foregroundStyle(.secondary)
-                }
-
-                Slider(value: $project.rolloffFactor, in: 0...2, step: 0.01)
-            }
-
-            Section("Culling") {
-                HStack {
-                    #if os(macOS)
-                        Text("Cull Distance (m):")
-                    #else
-                        Text("Cull Distance (m)")
-                    #endif
-
-                    Spacer()
-                    Text(project.cullDistance.rounded(to: 1).description)
-                        .foregroundStyle(.secondary)
-                }
-
-                Slider(value: $project.cullDistance, in: 1...10, step: 0.1)
-            }
-
-            Section("Events") {
-                Button("New Event") {
-                    popoverShown = true
-                }
-                List($project.soundEventAssets, id: \.id) { $item in
-                    NavigationLink(
-                        item.name,
-                        destination: SoundEventAssetEditorView(soundEventAsset: $item)
-                    )
-                }
-            }
+            NavigationLink(
+                "Run Project",
+                destination: ProjectArView(project: $project)
+            )
         }
         .navigationTitle(project.name)
         .popover(isPresented: $popoverShown) {

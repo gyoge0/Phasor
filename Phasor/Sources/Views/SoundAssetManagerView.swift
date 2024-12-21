@@ -141,8 +141,8 @@ struct SoundAssetManagerView: View {
         modelContext.insert(
             SoundAsset(
                 name: url.lastPathComponent,
-                data: audioData,
-                audioFormat: audioFormat
+                data: audioData
+                    //                audioFormat: audioFormat
             )
         )
         filePickerShown = false
