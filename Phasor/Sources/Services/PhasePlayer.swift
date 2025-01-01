@@ -78,7 +78,7 @@ class PhasePlayer: ObservableObject {
 
         return try PHASESoundEvent(
             engine: engine,
-            assetIdentifier: soundEvent.id.uuidString,
+            assetIdentifier: soundEvent.eventAsset.id.uuidString,
             mixerParameters: phaseMixerParameters
         )
     }
