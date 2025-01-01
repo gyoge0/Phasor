@@ -27,7 +27,7 @@ class SoundAsset {
 
     init(
         name: String = "New Asset",
-        data: Data,
+        data: Data
     ) {
         self.name = name
         self.data = data
