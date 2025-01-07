@@ -47,7 +47,6 @@ struct ProjectArView: View {
         .onAppear {
             try! player.loadProject(project: project)
             arViewDelegate.player = player
-            print(project.soundEventAssets.count)
         }
         .onDisappear {
         }
