@@ -23,6 +23,7 @@ class SoundAsset {
 
     var data: Data
 
+    @Relationship
     var associatedSoundEventAssets: [SoundEventAsset] = []
 
     init(

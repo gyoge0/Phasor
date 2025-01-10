@@ -8,6 +8,7 @@
 import PHASE
 import SwiftData
 import SwiftUI
+import ARKit
 
 struct ProjectEditorView: View {
     @Binding var project: PhasorProject
@@ -72,10 +73,13 @@ struct ProjectEditorView: View {
                     }
                 }
             }
-            NavigationLink(
-                "Run Project",
-                destination: ProjectArView(project: $project)
-            )
+            
+            if ARConfiguration.isSupported {
+                NavigationLink(
+                    "Run Project",
+                    destination: ProjectArView(project: $project)
+                )
+            }
         }
         .navigationTitle(project.name)
         .popover(isPresented: $popoverShown) {
@@ -97,7 +101,7 @@ struct ProjectEditorView: View {
                             newSoundEventAsset.associatedProjects.append(project)
                             modelContext.insert(newSoundEventAsset)
                             newSoundEventAsset = SoundEventAsset(name: "New Sound Event")
-                        }
+                        }.disabled(newSoundEventAsset.soundAsset == nil)
                     }
                 }
             }

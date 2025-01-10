@@ -22,10 +22,6 @@ struct SoundEventAssetEditorView: View {
     @State var currentlyPlayingAsset: SoundAsset?
     @State var creatingNewSoundEvent: Bool = false
 
-    var unusedSoundAssets: [SoundAsset] {
-        soundAssets.filter { !soundEventAsset.soundAssets.contains($0) }
-    }
-
     var body: some View {
         Form {
             Section("Playback Settings") {
@@ -65,54 +61,62 @@ struct SoundEventAssetEditorView: View {
 
             Section("Audio") {
                 Menu {
-                    ForEach(unusedSoundAssets, id: \.id) { soundAsset in
-                        Button(soundAsset.name) {
-                            soundEventAsset.soundAssets.append(soundAsset)
+                    ForEach(soundAssets, id: \.id) { soundAsset in
+                        Button {
+                            if soundEventAsset.soundAsset != soundAsset {
+                                playbackState = .stopped
+                                avAudioPlayer?.stop()
+                                currentlyPlayingAsset = nil
+                            }
+                            soundEventAsset.soundAsset = soundAsset
+                        } label: {
+                            HStack {
+                                Text(soundAsset.name)
+                                Spacer()
+                                if soundAsset == soundEventAsset.soundAsset {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
                         }
                     }
                 } label: {
                     // TODO: the menu is centered on the hstack
                     HStack {
-                        Text("Add Asset")
+                        Text("Asset")
                         Spacer()
+                        if let soundAsset = soundEventAsset.soundAsset {
+                            Text(soundAsset.name)
+                                .foregroundStyle(.selection)
+                        } else {
+                            Text("Choose")
+                                .foregroundStyle(.selection)
+                        }
                     }
-                }
-                .disabled(unusedSoundAssets.isEmpty)
+                }.foregroundStyle(.foreground)
 
-                List(soundEventAsset.soundAssets, id: \.id) { soundAsset in
-                    SoundAssetItem(
-                        soundAsset: soundAsset,
-                        currentlyPlayingAsset: $currentlyPlayingAsset,
-                        playbackState: $playbackState,
-                        avAudioPlayer: $avAudioPlayer,
-                        renameAction: nil,
-                        deleteAction: {
-                            if currentlyPlayingAsset == soundAsset {
-                                currentlyPlayingAsset = nil
-                                playbackState = .stopped
-                                avAudioPlayer.stop()
-                            }
-                            soundEventAsset.soundAssets.removeAll { $0 == soundAsset }
-                            soundAsset.associatedSoundEventAssets.removeAll {
-                                $0 == soundEventAsset
-                            }
-                        },
-                        playAsset: { _ in
+                if let soundAsset = soundEventAsset.soundAsset {
+                    Button(playbackState == .playing ? "Pause \(soundAsset.name)" : "Play \(soundAsset.name)") {
+                        if playbackState == .paused {
+                            avAudioPlayer.play()
+                            playbackState = .playing
+                        } else if playbackState == .stopped {
                             avAudioPlayer = try! AVAudioPlayer(data: soundAsset.data)
                             guard avAudioPlayer.prepareToPlay() && avAudioPlayer.play() else {
-                                #if DEBUG
-                                    print("couldn't play audio")
-                                #endif
+#if DEBUG
+                                print("couldn't play audio")
+#endif
                                 avAudioPlayer = nil
                                 currentlyPlayingAsset = nil
                                 playbackState = .stopped
                                 return
                             }
-
+                            
                             currentlyPlayingAsset = soundAsset
                             playbackState = .playing
+                        } else if playbackState == .playing {
+                            avAudioPlayer.pause()
                         }
-                    )
+                    }.disabled(soundEventAsset.soundAsset == nil)
                 }
             }
 

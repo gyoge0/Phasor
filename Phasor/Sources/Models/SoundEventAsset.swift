@@ -46,8 +46,7 @@ class SoundEventAsset {
 
     var associatedProjects: [PhasorProject] = []
 
-    @Relationship(inverse: \SoundAsset.associatedSoundEventAssets)
-    var soundAssets: [SoundAsset] = []
+    var soundAsset: SoundAsset? = nil
 
     init(name: String = "") {
         self.name = name

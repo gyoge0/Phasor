@@ -48,12 +48,10 @@ struct ProjectArView: View {
             try! player.loadProject(project: project)
             arViewDelegate.player = player
         }
-        .onDisappear {
-        }
     }
 
-    func checkTechnologiesSupported() -> Bool {
-        return ARConfiguration.isSupported && player.headTrackingSupported()
+    static func checkTechnologiesSupported() -> Bool {
+        return ARConfiguration.isSupported
     }
 
     private func placeSoundSource(playing soundEventAsset: SoundEventAsset) throws {

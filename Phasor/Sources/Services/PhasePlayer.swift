@@ -10,178 +10,122 @@ import CoreMotion
 import Foundation
 import PHASE
 
-//func simd_float4x4(
-//    _ a0: Float, _ a1: Float, _ a2: Float, _ a3: Float,
-//    _ b0: Float, _ b1: Float, _ b2: Float, _ b3: Float,
-//    _ c0: Float, _ c1: Float, _ c2: Float, _ c3: Float,
-//    _ d0: Float, _ d1: Float, _ d2: Float, _ d3: Float
-//) -> simd_float4x4 {
-//    return simd_float4x4(rows: [
-//        SIMD4<Float>(a0, a1, a2, a3),
-//        SIMD4<Float>(b0, b1, b2, b3),
-//        SIMD4<Float>(c0, c1, c2, c3),
-//        SIMD4<Float>(d0, d1, d2, d3),
-//    ])
-//}
 
+// because writing this class from scratch just doesn't play audio! :)
+/// Handles playing from SwiftData models by delegating to ``PhasePlayerFromUrl``
 class PhasePlayer: ObservableObject {
-    private let engine = PHASEEngine(updateMode: .automatic)
-    private let hmm = CMHeadphoneMotionManager()
-    private let listener: PHASEListener
-    private let spatialMixerDefinition: PHASESpatialMixerDefinition
-    private let spatialPipeline: PHASESpatialPipeline
-    private let distanceModelParameters: PHASEGeometricSpreadingDistanceModelParameters
+    private let phasePlayerFromUrl = PhasePlayerFromUrl()
 
     func registerSoundAsset(_ soundAsset: SoundAsset) throws {
         // the overload that uses Data just gives me EXC_BAD_ACCESS every time
         // workaround for now is to write to a file and read it
         let tempUrl = URL.documentsDirectory.appending(path: soundAsset.id.uuidString)
         try soundAsset.data.write(to: tempUrl)
-        try engine.assetRegistry
-            .registerSoundAsset(
-                url: tempUrl,
-                identifier: soundAsset.id.uuidString,
-                // this must be resident to load everything into memory
-                assetType: .resident,
-                // todo: need to store channel layout
-                channelLayout: nil,
-                normalizationMode: .dynamic
-            )
+        
+        try phasePlayerFromUrl
+            .addSoundAsset(url: tempUrl, identifier: soundAsset.id.uuidString)
+        
         // need to delete the temp file after finished
-        // todo: will deleting immediately before playing break it?
-        // try FileManager.default.removeItem(at: tempUrl)
+         try FileManager.default.removeItem(at: tempUrl)
     }
 
     func unregisterSoundAsset(_ soundAsset: SoundAsset) {
-        engine.assetRegistry
-            .unregisterAsset(identifier: soundAsset.id.uuidString)
+        phasePlayerFromUrl.removeAsset(identifier: soundAsset.id.uuidString)
     }
 
     func registerPlaybackSource(_ playbackSource: PlaybackSource) throws -> PHASESource {
-        let phaseSource = PHASESource(engine: engine)
-
-        phaseSource.transform = playbackSource.transform
-
-        try engine.rootObject.addChild(phaseSource)
-
-        return phaseSource
+        let transform = playbackSource.transform
+        
+        return try phasePlayerFromUrl.createPlaybackSource(transform: transform)
     }
 
     func registerSoundEvent(soundEvent: SoundEvent, source: PHASESource) throws -> PHASESoundEvent {
-        let phaseMixerParameters = PHASEMixerParameters()
-        phaseMixerParameters
-            .addSpatialMixerParameters(
-                identifier: spatialMixerDefinition.identifier,
+        return try phasePlayerFromUrl
+            .createSoundEvent(
                 source: source,
-                listener: listener
-            )
-
-        return try PHASESoundEvent(
-            engine: engine,
-            assetIdentifier: soundEvent.eventAsset.id.uuidString,
-            mixerParameters: phaseMixerParameters
+                soundEventAssetIdentifier: soundEvent.eventAsset.id.uuidString
         )
     }
 
     func registerSoundEventAsset(soundEventAsset: SoundEventAsset) throws {
-        let samplerNodeDefinition = PHASESamplerNodeDefinition(
-            soundAssetIdentifier: soundEventAsset.id.uuidString,
-            mixerDefinition: spatialMixerDefinition
-        )
-
-        samplerNodeDefinition.playbackMode = soundEventAsset.playbackMode
-        samplerNodeDefinition.setCalibrationMode(
-            calibrationMode: .relativeSpl,
-            level: soundEventAsset.calibrationLevel
-        )
-        samplerNodeDefinition.cullOption = soundEventAsset.cullOption
-
-        try engine.assetRegistry.registerSoundEventAsset(
-            rootNode: samplerNodeDefinition,
-            identifier: soundEventAsset.id.uuidString
-        )
+        try phasePlayerFromUrl
+            .createSoundEventAsset(
+                soundEventAssetIdentifier: soundEventAsset.id.uuidString,
+                // TODO: remove not nil assert
+                soundAssetIdentifier: soundEventAsset.soundAsset!.id.uuidString,
+                playbackMode: soundEventAsset.playbackMode,
+                calibrationLevel: soundEventAsset.calibrationLevel,
+                cullOption: soundEventAsset.cullOption
+            )
     }
-
-    init() {
-        self.listener = PHASEListener(engine: engine)
-        // Set the Listener's transform to the origin with no rotation.
-        self.listener.transform = matrix_identity_float4x4
-
-        // Attach the Listener to the Engine's Scene Graph via its Root Object.
-        // This actives the Listener within the simulation.
-        try! engine.rootObject.addChild(self.listener)
-
-        // Create a Spatial Pipeline.
-        let spatialPipelineOptions: PHASESpatialPipeline.Flags = [
-            .directPathTransmission, .lateReverb,
-        ]
-        self.spatialPipeline = PHASESpatialPipeline(flags: spatialPipelineOptions)!
-        self.spatialPipeline.entries[PHASESpatialCategory.lateReverb]!.sendLevel = 0.1
-
-        // Create a Spatial Mixer with the Spatial Pipeline.
-        self.spatialMixerDefinition = PHASESpatialMixerDefinition(
-            spatialPipeline: self.spatialPipeline
-        )
-
-        // Set the Spatial Mixer's Distance Model.
-        distanceModelParameters = PHASEGeometricSpreadingDistanceModelParameters()
-        spatialMixerDefinition.distanceModelParameters = distanceModelParameters
-
-        // start head tracking
-        hmm.startDeviceMotionUpdates(
-            to: OperationQueue.current!,
-            withHandler: { motion, error in
-                guard let motion = motion, error == nil else { return }
-                let m = motion.attitude.rotationMatrix
-                let c = self.listener.transform
-                // swift-format-ignore
-                let headphoneTransform = simd_float4x4(
-                    Float(m.m11), Float(m.m12), Float(m.m13), c.columns.3.x,
-                    Float(m.m21), Float(m.m22), Float(m.m23), c.columns.3.y,
-                    Float(m.m31), Float(m.m32), Float(m.m33), c.columns.3.z,
-                    Float(0),     Float(0),     Float(0),     Float(1)
-                )
-                self.listener.transform = headphoneTransform
-            }
-        )
+    
+    func updateTransform(with newTransform: simd_float4x4) {
+        phasePlayerFromUrl.listener.transform = newTransform
     }
 
     func loadProject(project: PhasorProject) throws {
-        engine.defaultReverbPreset = project.reverbPreset
-        distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(
-            cullDistance: project.cullDistance
-        )
+        phasePlayerFromUrl.engine.defaultReverbPreset = project.reverbPreset
+        
+        let distanceModelParameters = PHASEGeometricSpreadingDistanceModelParameters()
+        distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(cullDistance: project.cullDistance)
         distanceModelParameters.rolloffFactor = project.rolloffFactor
-
-        let phasePlaybackSources = try project.playbackSources.map {
-            try registerPlaybackSource($0)
+        phasePlayerFromUrl.spatialMixerDefinition.distanceModelParameters = distanceModelParameters
+        
+        
+        // register sound assets
+        var uniqueSoundAssets: [SoundAsset] = []
+        
+        let soundAssets = project.soundEventAssets
+            .map(\.soundAsset)
+            .filter { $0 != nil }
+        
+        // sure why not
+        for soundAsset in soundAssets {
+            guard let soundAsset else { continue }
+            var seen = false
+            for existingSoundAsset in uniqueSoundAssets {
+                if soundAsset == existingSoundAsset {
+                    seen = true
+                    break
+                }
+            }
+            if !seen {
+                try registerSoundAsset(soundAsset)
+                uniqueSoundAssets.append(soundAsset)
+            }
         }
+        
+        
+        // register sound event assets
         try project.soundEventAssets
-            .flatMap(\.soundAssets)
-            .forEach { try registerSoundAsset($0) }
-        try project.soundEventAssets.forEach { try registerSoundEventAsset(soundEventAsset: $0) }
+            .forEach { try registerSoundEventAsset(soundEventAsset: $0) }
+        
+        // register playback sources
+        let sourceToPhase: [PlaybackSource: PHASESource] = project.playbackSources
+            .reduce(into: [PlaybackSource: PHASESource]()) { dict, source in
+                if let phaseSource = try? registerPlaybackSource(source) {
+                    dict[source] = phaseSource
+                }
+            }
 
-        for (soundEvent, phasePlaybackSource) in zip(
-            project.soundEvents,
-            phasePlaybackSources
-        ) {
-            let phaseSoundEvent = try registerSoundEvent(
-                soundEvent: soundEvent,
-                source: phasePlaybackSource
-            )
-            phaseSoundEvent.start()
-        }
-    }
-
-    func updateTransform(with newTransform: simd_float4x4) {
-        listener.transform = newTransform
-    }
-
-    func headTrackingSupported() -> Bool {
-        return hmm.isDeviceMotionAvailable
+        // register sound events
+        let phaseSoundEvents = try project.soundEvents
+            .filter { sourceToPhase[$0.source] != nil}
+            .map { soundEvent in
+                try registerSoundEvent(
+                    soundEvent: soundEvent,
+                    // not nil assertion here since we checked in the filter
+                    source: sourceToPhase[soundEvent.source]!
+                )
+            }
+        
+        phaseSoundEvents
+            .forEach { $0.start() }
+        
+        try phasePlayerFromUrl.engine.start()
     }
 
     deinit {
-        hmm.stopDeviceMotionUpdates()
+        phasePlayerFromUrl.engine.stop()
     }
 }
