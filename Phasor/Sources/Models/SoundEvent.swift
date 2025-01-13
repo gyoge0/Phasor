@@ -1,34 +1,29 @@
 //
 //  SoundEvent.swift
-//  Phasor
+//  SData
 //
-//  Created by YOGESH THAMBIDURAI (875367) on 12/6/24.
+//  Created by YOGESH THAMBIDURAI (875367) on 1/11/25.
 //
 
 import Foundation
 import MetaCodable
-import PHASE
 import SwiftData
-import SwiftUI
 
-/// Playback of a SoundEventAsset from a PlaybackSource
 @Codable
 @Inherits(decodable: false, encodable: false)
 @Model
-class SoundEvent {
-
+public class SoundEvent: Identifiable {
     @Attribute(.unique)
-    var id: UUID = UUID()
+    public var id: UUID = UUID()
 
-    var source: PlaybackSource
+    public var soundEventAsset: SoundEventAsset
+    public var playbackSource: PlaybackSource
 
-    var eventAsset: SoundEventAsset
-
-    @IgnoreCoding
-    var project: PhasorProject? = nil
-
-    init(source: PlaybackSource, eventAsset: SoundEventAsset) {
-        self.source = source
-        self.eventAsset = eventAsset
+    public init(
+        soundEventAsset: SoundEventAsset,
+        playbackSource: PlaybackSource
+    ) {
+        self.soundEventAsset = soundEventAsset
+        self.playbackSource = playbackSource
     }
 }

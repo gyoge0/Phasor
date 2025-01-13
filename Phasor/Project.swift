@@ -34,8 +34,8 @@ let project = Project(
                     ],
                 ]
             ),
-            sources: ["Phasor/Sources/**"],
-            resources: ["Phasor/Resources/**"],
+            sources: ["Sources/**"],
+            resources: ["Resources/**"],
             dependencies: [
                 .external(name: "MetaCodable")
             ],
@@ -44,16 +44,6 @@ let project = Project(
                     .automaticCodeSigning(devTeam: "5J5Q86SD6J")
                     .codeSignIdentityAppleDevelopment()
             )
-        ),
-        .target(
-            name: "PhasorTests",
-            destinations: .iOS,
-            product: .unitTests,
-            bundleId: "com.gyoge.PhasorTests",
-            infoPlist: .default,
-            sources: ["Phasor/Tests/**"],
-            resources: [],
-            dependencies: [.target(name: "Phasor")]
-        ),
+        )
     ]
 )

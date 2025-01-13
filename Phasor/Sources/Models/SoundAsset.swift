@@ -1,35 +1,28 @@
 //
 //  SoundAsset.swift
-//  Phasor
+//  SData
 //
-//  Created by YOGESH THAMBIDURAI (875367) on 12/6/24.
+//  Created by YOGESH THAMBIDURAI (875367) on 1/11/25.
 //
 
 import Foundation
 import MetaCodable
-import PHASE
 import SwiftData
-import SwiftUI
 
-/// Audio track data.
 @Codable
 @Inherits(decodable: false, encodable: false)
 @Model
-class SoundAsset {
+public class SoundAsset: Identifiable {
     @Attribute(.unique)
-    var id: UUID = UUID()
+    public var id: UUID = UUID()
 
-    var name: String
+    public var name: String = "New Sound Asset"
+    public var data: Data
 
-    var data: Data
+    @Relationship(deleteRule: .cascade, inverse: \SoundEventAsset.soundAsset)
+    public var associatedSoundEventAssets: [SoundEventAsset] = []
 
-    @Relationship
-    var associatedSoundEventAssets: [SoundEventAsset] = []
-
-    init(
-        name: String = "New Asset",
-        data: Data
-    ) {
+    public init(name: String, data: Data) {
         self.name = name
         self.data = data
     }

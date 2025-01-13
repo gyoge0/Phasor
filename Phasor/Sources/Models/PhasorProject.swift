@@ -1,66 +1,43 @@
 //
-//  PhasorSubProject.swift
-//  Phasor
+//  PhasorProject.swift
+//  SData
 //
-//  Created by YOGESH THAMBIDURAI (875367) on 12/6/24.
+//  Created by YOGESH THAMBIDURAI (875367) on 1/11/25.
 //
 
 import Foundation
 import MetaCodable
 import PHASE
 import SwiftData
-import SwiftUI
 
 @Codable
 @Inherits(decodable: false, encodable: false)
 @Model
-class PhasorProject {
+public class PhasorProject: Identifiable {
     @Attribute(.unique)
-    var id: UUID = UUID()
+    public var id: UUID = UUID()
 
-    var name: String
+    public var name: String = "New Project"
+    public var cullDistance: Double = 1.0
+    public var rolloffFactor: Double = 1.0
 
-    var _rawReverbPreset: Int! = PHASEReverbPreset.mediumHall.rawValue
+    var rawReverbPreset: Int = PHASEReverbPreset.mediumHall.rawValue
 
-    @Transient var reverbPreset: PHASEReverbPreset {
-        get { return PHASEReverbPreset(rawValue: _rawReverbPreset)! }
-        set(newValue) { _rawReverbPreset = newValue.rawValue }
-    }
+    @Relationship(deleteRule: .cascade)
+    public var soundEventAssets: [SoundEventAsset] = []
 
-    /** Distance beyond which sound sources stop playing. Must be >= 1. */
-    var cullDistance: Double = 1.0
+    @Relationship(deleteRule: .cascade)
+    public var soundEvents: [SoundEvent] = []
 
-    /**
-     Strength of the rolloff effect when moving away from sound sources.
-     Values less than one create a quicker roll off and values greater than one create longer roll offs.
-     Must be >= 0.
-     */
-    var rolloffFactor: Double = 1.0
-
-    @Relationship(deleteRule: .cascade, inverse: \PlaybackSource.project)
-    var playbackSources: [PlaybackSource] = []
-
-    @Relationship(deleteRule: .nullify, inverse: \SoundEventAsset.associatedProjects)
-    var soundEventAssets: [SoundEventAsset] = []
-
-    @Relationship(deleteRule: .cascade, inverse: \SoundEvent.project)
-    var soundEvents: [SoundEvent] = []
-
-    init(name: String = "New Project") {
+    init(
+        name: String = "New Project",
+        cullDistance: Double = 1.0,
+        rolloffFactor: Double = 1.0,
+        rawReverbPreset: Int = PHASEReverbPreset.mediumHall.rawValue
+    ) {
         self.name = name
+        self.cullDistance = cullDistance
+        self.rolloffFactor = rolloffFactor
+        self.rawReverbPreset = rawReverbPreset
     }
-
-}
-
-extension PhasorProject: Transferable {
-    static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: .phasorProject)
-    }
-}
-
-extension UTType {
-    static var phasorProject = UTType(
-        exportedAs: "com.gyoge.phasor.phasorproject",
-        conformingTo: .package
-    )
 }
