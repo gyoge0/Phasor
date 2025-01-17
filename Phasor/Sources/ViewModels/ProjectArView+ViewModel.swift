@@ -23,7 +23,7 @@ extension ProjectArView {
         var modelContextComponent: ModelContextComponent
 
         init(project: PhasorProject) {
-            let player = PhasePlayer(project: project)
+            let player = PhasePlayer()
             let delegate = ProjectArDelegate(player: player)
             let errorMessageComponent = ErrorMessageComponent()
             let modelContextComponent = ModelContextComponent(
@@ -60,6 +60,18 @@ extension ProjectArView {
                 errorMessageComponent.isPresented = true
             }
 
+        }
+
+        func startPlayer() {
+            let result = player.loadProject(project: project)
+            if case .failure(_) = result {
+                errorMessageComponent.message = "Couldn't load project."
+                errorMessageComponent.isPresented = true
+            }
+        }
+
+        func stopPlayer() {
+            player.unloadProject(project: project)
         }
     }
 }

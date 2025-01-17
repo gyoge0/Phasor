@@ -50,6 +50,10 @@ struct ProjectArView: View {
         .errorMessage(errorMessageComponent: viewModel.errorMessageComponent)
         .onAppear {
             viewModel.modelContextComponent.modelContext = modelContext
+            viewModel.startPlayer()
+        }
+        .onDisappear {
+            viewModel.stopPlayer()
         }
     }
 

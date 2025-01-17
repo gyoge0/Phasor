@@ -184,7 +184,7 @@ class PhasePlayer {
         listener.transform = transform
     }
 
-    init(project: PhasorProject) {
+    init() {
         self.listener = PHASEListener(engine: engine)
         // Set the Listener's transform to the origin with no rotation.
         self.listener.transform = matrix_identity_float4x4
@@ -199,19 +199,22 @@ class PhasePlayer {
         ]
         self.spatialPipeline = PHASESpatialPipeline(flags: spatialPipelineOptions)!
         self.spatialPipeline.entries[PHASESpatialCategory.lateReverb]!.sendLevel = 0.1
-        engine.defaultReverbPreset = project.reverbPreset
 
         // Create a Spatial Mixer with the Spatial Pipeline.
         self.spatialMixerDefinition = PHASESpatialMixerDefinition(
             spatialPipeline: self.spatialPipeline
         )
+    }
+
+    func loadProject(project: PhasorProject) -> Result<(), Error> {
+        engine.defaultReverbPreset = project.reverbPreset
 
         // Set the Spatial Mixer's Distance Model.
         let distanceModelParameters = PHASEGeometricSpreadingDistanceModelParameters()
         distanceModelParameters.fadeOutParameters = PHASEDistanceModelFadeOutParameters(
             cullDistance: project.cullDistance
         )
-        distanceModelParameters.rolloffFactor = 1
+        distanceModelParameters.rolloffFactor = project.rolloffFactor
         spatialMixerDefinition.distanceModelParameters = distanceModelParameters
 
         // start head tracking
@@ -231,7 +234,7 @@ class PhasePlayer {
                 self.listener.transform = headphoneTransform
             }
         )
-        
+
         // probably should handle these results
         project.soundEventAssets.forEach {
             _ = registerSoundEventAsset(soundEventAsset: $0)
@@ -239,5 +242,18 @@ class PhasePlayer {
         project.soundEvents.forEach {
             _ = registerSoundEvent(soundEvent: $0)
         }
+
+        return Result { try engine.start() }
+    }
+
+    func unloadProject(project: PhasorProject) {
+        project.soundEvents.forEach {
+            engine.assetRegistry.unregisterAsset(identifier: $0.id.uuidString)
+        }
+        project.soundEventAssets.forEach {
+            engine.assetRegistry.unregisterAsset(identifier: $0.id.uuidString)
+        }
+
+        engine.stop()
     }
 }
