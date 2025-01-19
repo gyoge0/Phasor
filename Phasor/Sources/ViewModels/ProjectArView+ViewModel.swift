@@ -56,7 +56,9 @@ extension ProjectArView {
             case .success(let phaseSoundEvent):
                 phaseSoundEvent.start()
                 modelContextComponent.modelContext.insert(soundEvent)
-                _ = modelContextComponent.trySaveModelContext(withMessage: "Couldn't save sound source.")
+                _ = modelContextComponent.trySaveModelContext(
+                    withMessage: "Couldn't save sound source."
+                )
                 project.soundEvents.append(soundEvent)
             case .failure(_):
                 errorMessageComponent.message = "Couldn't place sound source."
@@ -71,11 +73,11 @@ extension ProjectArView {
                 errorMessageComponent.message = "Couldn't load project."
                 errorMessageComponent.isPresented = true
             }
-            
+
             _ = project.soundEvents
                 .map { $0.playbackSource.transform }
                 .map { Transform(matrix: $0) }
-                .map { delegate.placeOrb(at: $0)}
+                .map { delegate.placeOrb(at: $0) }
         }
 
         func stopPlayer() {
