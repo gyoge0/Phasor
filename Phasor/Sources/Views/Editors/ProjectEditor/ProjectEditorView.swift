@@ -67,6 +67,19 @@ struct ProjectEditorView: View {
         }
         .navigationTitle(project.name)
         .navigationBarTitleDisplayMode(inPopover ? .inline : .large)
+        .toolbar {
+            if !inPopover {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(
+                        item: project,
+                        preview: SharePreview(
+                            project.name,
+                            icon: Image("phasor_icon")
+                        )
+                    )
+                }
+            }
+        }
         .saveCancelToolbar(
             isPresented: inPopover,
             onSave: { onDismissPopover(true) },
