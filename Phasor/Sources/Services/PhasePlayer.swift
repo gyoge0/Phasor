@@ -128,7 +128,7 @@ class PhasePlayer {
         return soundEventAsset
     }
 
-    public func registerSoundEvent(soundEvent: SoundEvent) -> Result<(), any Error> {
+    public func registerSoundEvent(soundEvent: SoundEvent) -> Result<PHASESoundEvent, any Error> {
         return Result {
             // this might not exist
             if playbackSourceMap[soundEvent.playbackSource] == nil {
@@ -155,6 +155,7 @@ class PhasePlayer {
             )
             phaseSoundEvent.start()
             soundEventMap[soundEvent] = phaseSoundEvent
+            return phaseSoundEvent
         }
     }
 
@@ -240,7 +241,9 @@ class PhasePlayer {
             _ = registerSoundEventAsset(soundEventAsset: $0)
         }
         project.soundEvents.forEach {
-            _ = registerSoundEvent(soundEvent: $0)
+            if case .success(let phaseSoundEvent) = registerSoundEvent(soundEvent: $0) {
+                phaseSoundEvent.start()
+            }
         }
 
         return Result { try engine.start() }

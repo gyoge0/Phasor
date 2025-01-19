@@ -41,9 +41,9 @@ class ProjectArDelegate: NSObject, ARSessionDelegate {
     }
 
     // this function has access to ARKit and can be called from SwiftUI
-    func placeOrb() -> SIMD3<Float> {
-        let cameraTransform = arView.cameraTransform
-        let position = getPosition(forwards: distance, from: cameraTransform)
+    func placeOrb(at inputTransform: Transform? = nil) -> SIMD3<Float> {
+        let transform = inputTransform ?? arView.cameraTransform
+        let position = getPosition(forwards: distance, from: transform)
 
         let sphere = MeshResource.generateSphere(radius: 0.2)
         let material = SimpleMaterial(color: .blue, isMetallic: true)
