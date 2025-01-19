@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct SDataApp: App {
+struct PhasorApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
