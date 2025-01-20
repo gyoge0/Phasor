@@ -8,7 +8,7 @@
 import CoreTransferable
 import UniformTypeIdentifiers
 
-extension PhasorProject : Transferable {
+extension PhasorProject: Transferable {
     public static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .phasorProject)
     }
