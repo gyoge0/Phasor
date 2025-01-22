@@ -4,15 +4,23 @@ import SwiftUI
 @main
 struct PhasorApp: App {
     var body: some Scene {
-        WindowGroup {
-            HomeView()
-        }
-        .modelContainer(for: [
-            SoundAsset.self,
-            SoundEventAsset.self,
-            SoundEvent.self,
-            PlaybackSource.self,
-            PhasorProject.self,
-        ])
+        DocumentGroup(
+            editing: [
+                SoundAsset.self,
+                SoundEventAsset.self,
+                SoundEvent.self,
+                PlaybackSource.self,
+                PhasorProject.self,
+            ],
+            contentType: .phasorProject,
+            editor: {
+                DocumentHomeView()
+            },
+            prepareDocument: { modelContext in
+                let newProject = PhasorProject()
+                modelContext.insert(newProject)
+                try? modelContext.save()
+            }
+        )
     }
 }
