@@ -16,14 +16,11 @@ public class SoundEvent: Identifiable {
     @Attribute(.unique)
     public var id: UUID = UUID()
 
-    public var soundEventAsset: SoundEventAsset
     public var playbackSource: PlaybackSource
 
     public init(
-        soundEventAsset: SoundEventAsset,
         playbackSource: PlaybackSource
     ) {
-        self.soundEventAsset = soundEventAsset
         self.playbackSource = playbackSource
     }
 }

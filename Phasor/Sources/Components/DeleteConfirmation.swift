@@ -54,10 +54,11 @@ public class DeleteConfirmationComponent<T: PersistentModel> {
         let name = getModelName()
         self.deletingModel = nil
 
-        modelContextComponent.modelContext.delete(deletingModel)
-        _ = modelContextComponent.trySaveModelContext(
-            withMessage: "Couldn't save \(name)"
-        )
+        _ = modelContextComponent.delete(deletingModel).map {
+            modelContextComponent.trySaveModelContext(
+                withMessage: "Couldn't save \(name)"
+            )
+        }
     }
 
     public func getModelName() -> String {

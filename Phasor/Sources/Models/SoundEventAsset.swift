@@ -26,7 +26,7 @@ public class SoundEventAsset: Identifiable {
     var rawPlaybackMode: Int
     var rawCullOption: Int
 
-    @Relationship(deleteRule: .cascade, inverse: \SoundEvent.soundEventAsset)
+    @Relationship(deleteRule: .cascade)
     public var associatedSoundEvents: [SoundEvent] = []
 
     public init(

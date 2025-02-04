@@ -128,26 +128,28 @@ class PhasePlayer {
         return soundEventAsset
     }
 
-    public func registerSoundEvent(soundEvent: SoundEvent) -> Result<PHASESoundEvent, any Error> {
+    public func registerSoundEvent(
+        soundEvent: SoundEvent,
+        soundEventAsset: SoundEventAsset
+    ) -> Result<PHASESoundEvent, any Error> {
         return Result {
             // this might not exist
             if playbackSourceMap[soundEvent.playbackSource] == nil {
-                try registerPlaybackSource(
+                let result = registerPlaybackSource(
                     playbackSource: soundEvent.playbackSource
-                ).get()
+                )
+                try result.get()
             }
 
             // this has to exist now
             let playbackSource = playbackSourceMap[soundEvent.playbackSource]!
 
-            if soundEventAssetMap[soundEvent.soundEventAsset] == nil {
-                try registerSoundEventAsset(
-                    soundEventAsset: soundEvent.soundEventAsset
-                ).get()
+            if soundEventAssetMap[soundEventAsset] == nil {
+                let result = registerSoundEventAsset(
+                    soundEventAsset: soundEventAsset
+                )
+                try result.get()
             }
-
-            // this has to exist now
-            let soundEventAsset = soundEvent.soundEventAsset
 
             let phaseSoundEvent = try createSoundEvent(
                 source: playbackSource,
@@ -237,12 +239,15 @@ class PhasePlayer {
         )
 
         // probably should handle these results
-        project.soundEventAssets.forEach {
-            _ = registerSoundEventAsset(soundEventAsset: $0)
-        }
-        project.soundEvents.forEach {
-            if case .success(let phaseSoundEvent) = registerSoundEvent(soundEvent: $0) {
-                phaseSoundEvent.start()
+        project.soundEventAssets.forEach { soundEventAsset in
+            _ = registerSoundEventAsset(soundEventAsset: soundEventAsset)
+            soundEventAsset.associatedSoundEvents.forEach { soundEvent in
+                if case .success(let phaseSoundEvent) = registerSoundEvent(
+                    soundEvent: soundEvent,
+                    soundEventAsset: soundEventAsset
+                ) {
+                    phaseSoundEvent.start()
+                }
             }
         }
 
