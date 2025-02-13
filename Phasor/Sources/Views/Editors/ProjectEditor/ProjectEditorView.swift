@@ -63,6 +63,7 @@ struct ProjectEditorView: View {
 
             if viewModel.technologiesSupported {
                 NavigationLink("Play", destination: ProjectArView(project: project))
+                    .foregroundStyle(.selection)
             }
         }
         .navigationTitle(project.name)
