@@ -24,7 +24,7 @@ let project = Project(
                             "UTTypeConformsTo": [
                                 "com.apple.package"
                             ],
-                            "UTTypeDescription": "Phasor project",
+                            "UTTypeDescription": "Phasor Project",
                             "UTTypeTagSpecification": [
                                 "public.filename-extension": [
                                     "phasorproject"
