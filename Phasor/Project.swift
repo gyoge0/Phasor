@@ -32,6 +32,17 @@ let project = Project(
                             ],
                         ]
                     ],
+                    "CFBundleDocumentTypes": [
+                        [
+                            "CFBundleTypeIconFiles": [],
+                            "CFBundleTypeName": "Phasor Project",
+                            "LSHandlerRank": "Owner",
+                            "LSItemContentTypes": [
+                                "com.gyoge.phasor.phasorproject"
+                            ],
+                        ]
+                    ],
+                    "LSSupportsOpeningDocumentsInPlace": false,
                 ]
             ),
             sources: ["Sources/**"],
