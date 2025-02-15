@@ -26,6 +26,7 @@ extension SoundAssetLibraryView {
         public var modelContextComponent: ModelContextComponent
         public var deleteConfirmationComponent: DeleteConfirmationComponent<SoundAsset>
         public var renameModalComponent: RenameModalComponent<SoundAsset>
+        public var fileImporterComponent: FileImporterComponent
 
         init() {
             // construct dependency graph
@@ -49,12 +50,17 @@ extension SoundAssetLibraryView {
                 namePath: \SoundAsset.name,
                 modelContextComponent: modelContextComponent
             )
+            let fileImporterComponent = FileImporterComponent(
+                modelContextComponent: modelContextComponent,
+                errorMessageComponent: errorMessageComponent
+            )
 
             // assign all at once
             self.errorMessageComponent = errorMessageComponent
             self.modelContextComponent = modelContextComponent
             self.deleteConfirmationComponent = deleteConfirmationComponent
             self.renameModalComponent = renameModalComponent
+            self.fileImporterComponent = fileImporterComponent
         }
 
         public var audioPlayer: AudioPlayer = AudioPlayer()
@@ -64,23 +70,7 @@ extension SoundAssetLibraryView {
         }
 
         public func importFile(url: URL) {
-            guard url.startAccessingSecurityScopedResource() else {
-                errorMessageComponent.message = "Something went wrong accessing the file."
-                errorMessageComponent.isPresented = true
-                return
-            }
-            defer { url.stopAccessingSecurityScopedResource() }
-
-            guard let data = try? Data(contentsOf: url) else {
-                errorMessageComponent.message = "Something went wrong reading the file."
-                errorMessageComponent.isPresented = true
-                return
-            }
-
-            let soundAsset = SoundAsset(name: url.lastPathComponent, data: data)
-            modelContext.insert(soundAsset)
-            // should an error be shown?
-            try? modelContext.save()
+            _ = fileImporterComponent.importFile(url: url, name: nil)
         }
 
         public func tapAsset(asset: SoundAsset) {
