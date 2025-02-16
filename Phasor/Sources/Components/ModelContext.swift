@@ -31,45 +31,4 @@ public class ModelContextComponent {
             return false
         }
     }
-    
-    public func delete(soundEvent: SoundEvent) {
-        modelContext.delete(soundEvent)
-    }
-    
-    public func delete(soundEventAsset: SoundEventAsset) {
-        soundEventAsset.associatedSoundEvents.forEach { delete(soundEvent: $0) }
-        modelContext.delete(soundEventAsset)
-    }
-    
-    public func delete(soundAsset: SoundAsset) {
-        soundAsset.associatedSoundEventAssets
-            .forEach { delete(soundEventAsset: $0) }
-        modelContext.delete(soundAsset)
-    }
-    
-    public func delete(project: PhasorProject) {
-        project.soundEvents.forEach { delete(soundEvent: $0) }
-        project.soundEventAssets.forEach { delete(soundEventAsset: $0) }
-        modelContext.delete(project)
-    }
-    
-    public enum DeleteError: Error {
-        case unknownModel
-    }
-    public func delete(_ model: any PersistentModel) -> Result<(), DeleteError> {
-        switch model {
-        case let project as PhasorProject:
-            delete(project: project)
-        case let soundAsset as SoundAsset:
-            delete(soundAsset: soundAsset)
-        case let soundEventAsset as SoundEventAsset:
-            delete(soundEventAsset: soundEventAsset)
-        case let soundEvent as SoundEvent:
-            delete(soundEvent: soundEvent)
-        default:
-            return Result.failure(DeleteError.unknownModel)
-        }
-        return Result.success(())
-    }
-    
 }
