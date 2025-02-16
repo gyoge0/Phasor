@@ -70,7 +70,11 @@ extension SoundAssetLibraryView {
         }
 
         public func importFile(url: URL) {
-            _ = fileImporterComponent.importFile(url: url, name: nil)
+            guard let soundAsset = fileImporterComponent.importFile(url: url, name: nil) else {
+                return
+            }
+            modelContextComponent.modelContext.insert(soundAsset)
+            _ = modelContextComponent.trySaveModelContext(withMessage: "Something went wrong.")
         }
 
         public func tapAsset(asset: SoundAsset) {

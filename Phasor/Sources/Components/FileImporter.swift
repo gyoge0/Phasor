@@ -34,12 +34,8 @@ public class FileImporterComponent {
         }
 
         let soundAsset = SoundAsset(name: name ?? url.lastPathComponent, data: data)
-        modelContextComponent.modelContext.insert(soundAsset)
-        if !modelContextComponent.trySaveModelContext(withMessage: "Something went wrong.") {
-            return soundAsset
-        } else {
-            return nil
-        }
+
+        return soundAsset
     }
 
 }
