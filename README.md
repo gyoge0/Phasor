@@ -19,8 +19,8 @@ Phasor uses some licensed music, and I don't think it's a very smart idea to tra
 
 |Name            |Path                                            |
 |----------------|------------------------------------------------|
-|Espresso Backing|`Phasor/Resources/Espresso/espresso_backing.wav`|
-|Espresso Bass   |`Phasor/Resources/Espresso/espresso_bass.wav`   |
-|Espresso Drums  |`Phasor/Resources/Espresso/espresso_drums.wav`  |
-|Espresso Guitar |`Phasor/Resources/Espresso/espresso_guitar.wav` |
-|Espresso Vocals |`Phasor/Resources/Espresso/espresso_vocals.wav` |
+|Espresso Backing|`Phasor/Resources/Espresso/espresso_backing.m4a`|
+|Espresso Bass   |`Phasor/Resources/Espresso/espresso_bass.m4a`   |
+|Espresso Drums  |`Phasor/Resources/Espresso/espresso_drums.m4a`  |
+|Espresso Guitar |`Phasor/Resources/Espresso/espresso_guitar.m4a` |
+|Espresso Vocals |`Phasor/Resources/Espresso/espresso_vocals.m4a` |

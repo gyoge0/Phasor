@@ -74,7 +74,7 @@ extension OnboardingView {
             for track in tracks {
                 let audioFileUrl = Bundle.main.url(
                     forResource: getAudioFile(for: track),
-                    withExtension: "wav"
+                    withExtension: "m4a"
                 )!
                 let location = locations[track]!
 
