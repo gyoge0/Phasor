@@ -34,7 +34,7 @@ struct OnboardingView: View {
             Tab {
                 Image("ARKit")
                     .hero(width: 150, height: 150)
-                Caption(text: "Use headphones augmented reality to experience your projects")
+                Caption(text: "Use headphones and augmented reality to experience your projects")
             }
             Tab {
                 Image(systemName: "airpods.max")
