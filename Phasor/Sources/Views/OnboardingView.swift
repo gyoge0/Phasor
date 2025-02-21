@@ -46,7 +46,8 @@ struct OnboardingView: View {
             }
             Tab {
                 Button("Get started", action: onFinish)
-                    .buttonStyle(.borderedProminent)
+                    .font(.largeTitle)
+                    .padding()
             }
         }
         .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
