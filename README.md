@@ -24,3 +24,35 @@ Phasor uses some licensed music, and I don't think it's a very smart idea to tra
 |Espresso Drums  |`Phasor/Resources/Espresso/espresso_drums.m4a`  |
 |Espresso Guitar |`Phasor/Resources/Espresso/espresso_guitar.m4a` |
 |Espresso Vocals |`Phasor/Resources/Espresso/espresso_vocals.m4a` |
+
+## Architecture
+
+See the mermaid diagram:
+```mermaid
+graph BT
+    subgraph UI
+        SwiftUI
+        ARKit
+    end
+
+    ViewModels
+
+    subgraph Services
+        CoreMotion
+        PHASE
+    end
+
+    subgraph Persistence
+        SwiftData
+    end
+
+    SwiftUI -->|Interactions| ViewModels
+    ViewModels -->|Models| SwiftUI
+    ViewModels -->|Sound Source Locations| ARKit
+
+    ARKit -->|Position Data| ViewModels
+    CoreMotion -->|Rotation Data| PHASE
+    ViewModels -->|Project Info| PHASE
+    ViewModels -->|Position Data| PHASE
+    ViewModels <-->|Models| SwiftData
+```
