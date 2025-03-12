@@ -13,6 +13,8 @@ cd Phasor
 tuist generate
 ```
 
+The generated project will try and use my local development signing team. Use the signing and capabilities menu in Xcode to change it to yours, or update the Tuist project locally.
+
 ## Ignored Music
 
 Phasor uses some licensed music which is not checked into git. See the table below for music that needs to be added.
