@@ -15,7 +15,7 @@ tuist generate
 
 ## Ignored Music
 
-Phasor uses some licensed music, and I don't think it's a very smart idea to track them with git. See the table below for music that needs to be added.
+Phasor uses some licensed music which is not checked into git. See the table below for music that needs to be added.
 
 |Name            |Path                                            |
 |----------------|------------------------------------------------|
