@@ -65,7 +65,18 @@ extension OnboardingView {
             self.fileImporterComponent = fileImporterComponent
         }
 
+        func clearModels() throws {
+            try modelContext.delete(model: SoundAsset.self)
+            try modelContext.delete(model: PlaybackSource.self)
+            try modelContext.delete(model: SoundEventAsset.self)
+            try modelContext.delete(model: SoundEvent.self)
+            try modelContext.delete(model: PhasorProject.self)
+        }
+
         func loadDemoProject() async {
+            // ignore this for now
+            try? clearModels()
+
             var soundAssets: [SoundAsset] = []
             var soundEventAssets: [SoundEventAsset] = []
             var playbackSources: [PlaybackSource] = []
